@@ -2,7 +2,7 @@
 #include <nstd/Console.h>
 #include <nstd/Error.h>
 
-#include "Server.h"
+#include "Serverhandler.h"
 
 int main()
 {
@@ -16,7 +16,7 @@ int main()
     if (!listener.listen())
         return Console::errorf("Could not listen on socket: %s\n", (const char*)Error::getErrorString()), 1;
 
-    Server server;
+    ServerHandler server;
     server.addListener(listener);
 
     for (;;)

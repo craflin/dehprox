@@ -1,5 +1,5 @@
 
-#include "Server.h"
+#include "ServerHandler.h"
 
 #ifndef _WIN32
 #include <arpa/inet.h>
@@ -20,7 +20,7 @@ bool getOriginalDst(Socket& s, uint32& ip, uint16& port)
 #endif
 }
 
-bool Server::onAccept(Socket& socket)
+bool ServerHandler::onAccept(Socket& socket)
 {
     Socket s;
     uint32 ip;
@@ -34,7 +34,7 @@ bool Server::onAccept(Socket& socket)
     return true;
 }
 
-bool Server::poll()
+bool ServerHandler::poll()
 {
     Socket::Poll::Event event;
     if (!_poll.poll(event, 60 * 1000))

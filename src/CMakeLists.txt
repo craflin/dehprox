@@ -4,8 +4,8 @@ set(sources
     Client.cpp
     Client.h
     Connection.h
-    Server.cpp
-    Server.h
+    ServerHandler.cpp
+    ServerHandler.h
     Uplink.cpp
     Uplink.h
 )

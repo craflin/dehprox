@@ -5,7 +5,7 @@
 #include <nstd/PoolList.h>
 #include "Client.h"
 
-class Server
+class ServerHandler
 {
 public:
     void addListener(Socket& socket) { _poll.set(socket, Socket::Poll::acceptFlag);}

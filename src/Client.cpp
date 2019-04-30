@@ -1,8 +1,8 @@
 
 #include "Client.h"
-#include "Server.h"
+#include "ServerHandler.h"
 
-void Client::connect(Server& server, Socket& client, uint32 ip, uint16 port)
+void Client::connect(ServerHandler& server, Socket& client, uint32 ip, uint16 port)
 {
     _server = &server;
     swap(client);

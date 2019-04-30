@@ -3,12 +3,12 @@
 
 #include "Uplink.h"
 
-class Server;
+class ServerHandler;
 
 class Client : public Connection
 {
 public:
-    void connect(Server& server, Socket& client, uint32 ip, uint16 port);
+    void connect(ServerHandler& server, Socket& client, uint32 ip, uint16 port);
 
     void onUplinkConnected();
 
@@ -17,7 +17,7 @@ public: // Connection
     virtual bool onWrite();
 
 public:
-    Server* _server;
+    ServerHandler* _server;
     Uplink _uplink;
 };
 

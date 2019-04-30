@@ -1,8 +1,8 @@
 
 #include "Uplink.h"
-#include "Server.h"
+#include "ServerHandler.h"
 
-void Uplink::connect(Server& server, Client& client, uint32 ip, uint16 port)
+void Uplink::connect(ServerHandler& server, Client& client, uint32 ip, uint16 port)
 {
     _server = &server;
     _client = &client;

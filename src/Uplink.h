@@ -4,12 +4,12 @@
 #include "Connection.h"
 
 class Client;
-class Server;
+class ServerHandler;
 
 class Uplink : public Connection
 {
 public:
-    void connect(Server& server, Client& client, uint32 ip, uint16 port);
+    void connect(ServerHandler& server, Client& client, uint32 ip, uint16 port);
 
     bool onConnected();
 
@@ -18,6 +18,6 @@ public: // Connection
     virtual bool onWrite();
 
 private:
-    Server* _server;
+    ServerHandler* _server;
     Client* _client;
 };
