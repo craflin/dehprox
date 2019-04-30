@@ -31,6 +31,7 @@ bool Server::onAccept(Socket& socket)
         return false;
     Client& client = _clients.append();
     client.connect(*this, s, ip, port);
+    return true;
 }
 
 bool Server::poll()
@@ -49,4 +50,5 @@ bool Server::poll()
         return true;
     if (event.flags & Socket::Poll::writeFlag && !((Connection*)event.socket)->onWrite())
         return true;
+    return true;
 }
