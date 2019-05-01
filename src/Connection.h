@@ -1,10 +1,22 @@
+
 #pragma once
 
-#include <nstd/Socket/Socket.h>
+#include <nstd/Socket/Server.h>
 
-class Connection : public Socket
+class Connection
 {
 public:
-    virtual bool onRead() = 0;
-    virtual bool onWrite() = 0;
+    class ICallback
+    {;
+    public:
+        virtual void onOpened() = 0;
+        virtual void onRead() = 0;
+        virtual void onWrite() = 0;
+        virtual void onClosed() = 0;
+        virtual void onAbolished() = 0;
+
+    protected:
+        ICallback() {}
+        ~ICallback() {}
+    };
 };

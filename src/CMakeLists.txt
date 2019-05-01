@@ -1,13 +1,17 @@
 
 set(sources
-    Main.cpp
     Client.cpp
     Client.h
     Connection.h
-    ServerHandler.cpp
-    ServerHandler.h
-    Uplink.cpp
-    Uplink.h
+    DirectLine.cpp
+    DirectLine.h
+    Hostname.cpp
+    Hostname.h
+    Listener.cpp
+    Listener.h
+    Main.cpp
+    ProxyLine.cpp
+    ProxyLine.h
 )
 
 add_executable(dehprox

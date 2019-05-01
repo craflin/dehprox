@@ -1,23 +1,56 @@
 
 #pragma once
 
-#include "Uplink.h"
+#include <nstd/Socket/Server.h>
 
-class ServerHandler;
+#include "Connection.h"
+#include "DirectLine.h"
+#include "ProxyLine.h"
 
-class Client : public Connection
+class Client : public Connection::ICallback
+             , public DirectLine::ICallback
+             , public ProxyLine::ICallback
 {
 public:
-    void connect(ServerHandler& server, Socket& client, uint32 ip, uint16 port);
+    class ICallback
+    {;
+    public:
+        virtual void onClosed(Client& client) = 0;
 
-    void onUplinkConnected();
-
-public: // Connection
-    virtual bool onRead();
-    virtual bool onWrite();
+    protected:
+        ICallback() {}
+        ~ICallback() {}
+    };
 
 public:
-    ServerHandler* _server;
-    Uplink _uplink;
+    Client(Server& server, ICallback& callback);
+    ~Client();
+
+    bool accept(Server::Handle& handle);
+
+public: // Connection::ICallback
+    virtual void onOpened() {}
+    virtual void onRead();
+    virtual void onWrite();
+    virtual void onClosed();
+    virtual void onAbolished() {}
+
+public: // DirectLine::ICallback
+    virtual void onOpened(DirectLine&);
+    virtual void onClosed(DirectLine&);
+    virtual void onAbolished(DirectLine&);
+
+public: // ProxyLine::ICallback
+    virtual void onOpened(ProxyLine&);
+    virtual void onClosed(ProxyLine&);
+    virtual void onAbolished(ProxyLine&);
+
+public:
+    Server& _server;
+    ICallback& _callback;
+    Server::Handle* _handle;
+    ProxyLine* _proxyLine;
+    DirectLine* _directLine;
+    Server::Handle* _activeLine;
 };
 
