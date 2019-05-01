@@ -16,9 +16,9 @@ DirectLine::~DirectLine()
         _server.close(*_handle);
 }
 
-bool DirectLine::connect(uint32 addr, uint16 port)
+bool DirectLine::connect(const Address& address)
 {
-    _handle = _server.connect(addr, port, this);
+    _handle = _server.connect(address.addr, address.port, this);
     if (!_handle)
         return false;
     return true;
@@ -31,7 +31,7 @@ void DirectLine::onOpened()
 
 void DirectLine::onRead()
 {
-    byte buffer[16384];
+    byte buffer[262144];
     usize size;
     if (!_server.read(*_handle, buffer, sizeof(buffer), size))
         return;
@@ -54,5 +54,5 @@ void DirectLine::onClosed()
 
 void DirectLine::onAbolished()
 {
-    _callback.onAbolished(*this);
+    _callback.onClosed(*this);
 }

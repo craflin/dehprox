@@ -4,6 +4,7 @@
 #include <nstd/String.h>
 
 #include "Connection.h"
+#include "Address.h"
 
 class Server;
 
@@ -15,7 +16,6 @@ public:
     public:
         virtual void onOpened(ProxyLine&) = 0;
         virtual void onClosed(ProxyLine&) = 0;
-        virtual void onAbolished(ProxyLine&) = 0;
 
     protected:
         ICallback() {}
@@ -26,7 +26,7 @@ public:
     ProxyLine(Server& server, Server::Handle& client, ICallback& callback);
     ~ProxyLine();
 
-    bool connect(const String& hostname, int16 port);
+    bool connect(const Address& proxy, const String& hostname, int16 port);
 
     Server::Handle* getHandle() const {return _handle;}
 
@@ -43,4 +43,6 @@ private:
     ICallback& _callback;
     Server::Handle* _handle;
     String _hostname;
+    uint16 _port;
+    bool _connected;
 };

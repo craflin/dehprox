@@ -7,16 +7,24 @@
 
 int main()
 {
+    Address proxy;
+    proxy.addr = Socket::loopbackAddr;
+    proxy.port = 3129;
+    Address listen;
+    listen.addr = Socket::anyAddr;
+    listen.port = 62124;
+
+
     Server server;
     server.setKeepAlive(true);
     server.setNoDelay(true);
-    Listener listener(server);
-    if(!server.listen(Socket::anyAddr, 62124, nullptr))
+    Listener listener(server, proxy);
+    if(!server.listen(listen.addr, listen.port, nullptr))
     {
-        Log::errorf("Could not listen on port %hu: %s", (uint16)62124, (const char*)Socket::getErrorString());
+        Log::errorf("Could not listen on port %hu: %s", (uint16)listen.port, (const char*)Socket::getErrorString());
         return 1;
     }
-    Log::infof("Listening on port %hu...", (uint16)62124);
+    Log::infof("Listening on port %hu...", (uint16)listen.port);
     for(Server::Event event; server.poll(event);)
         switch(event.type)
         {

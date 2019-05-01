@@ -45,31 +45,30 @@ Client::~Client()
     delete _directLine;
 }
 
-bool Client::accept(Server::Handle& handle)
+bool Client::accept(const Address& proxy, Server::Handle& listener)
 {
-    uint32 addr;
-    uint16 port;
-    _handle = _server.accept(handle, this, &addr, &port, true);
+    Address address;
+    _handle = _server.accept(listener, this, &address.addr, &address.port, true);
     if (!_handle)
         return false;
     Socket* clientSocket = _server.getSocket(*_handle);
     if (!clientSocket ||
-        !getOriginalDst(*clientSocket, addr, port))
+        !getOriginalDst(*clientSocket, address.addr, address.port))
         return false;
 
     String hostname;
-    if (!Hostname::reverseResolveFake(addr, port, hostname))
+    if (!Hostname::reverseResolveFake(address.addr, hostname))
     {
         _directLine = new DirectLine(_server, *_handle, *this);
-        if (!_directLine->connect(addr, port))
+        if (!_directLine->connect(address))
             return false;
 
-        if (!Hostname::reverseResolve(addr, port, hostname))
-            hostname = Socket::inetNtoA(addr);
+        if (!Hostname::reverseResolve(address.addr, hostname))
+            hostname = Socket::inetNtoA(address.addr);
     }
 
     _proxyLine = new ProxyLine(_server, *_handle, *this);
-    if (!_proxyLine->connect(hostname, port))
+    if (!_proxyLine->connect(proxy, hostname, address.port))
         return false;
 
     return true;
@@ -77,7 +76,7 @@ bool Client::accept(Server::Handle& handle)
 
 void Client::onRead()
 {
-    byte buffer[16384];
+    byte buffer[262144];
     usize size;
     if (!_server.read(*_handle, buffer, sizeof(buffer), size))
         return;
@@ -111,11 +110,6 @@ void Client::onOpened(DirectLine&)
 
 void Client::onClosed(DirectLine&)
 {
-    _callback.onClosed(*this);
-}
-
-void Client::onAbolished(DirectLine&)
-{
     delete _directLine;
     _directLine = nullptr;
     if (!_proxyLine)
@@ -133,11 +127,6 @@ void Client::onOpened(ProxyLine&)
 }
 
 void Client::onClosed(ProxyLine&)
-{
-    _callback.onClosed(*this);
-}
-
-void Client::onAbolished(ProxyLine&)
 {
     delete _proxyLine;
     _proxyLine = nullptr;

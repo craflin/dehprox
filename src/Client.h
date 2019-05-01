@@ -6,6 +6,7 @@
 #include "Connection.h"
 #include "DirectLine.h"
 #include "ProxyLine.h"
+#include "Address.h"
 
 class Client : public Connection::ICallback
              , public DirectLine::ICallback
@@ -26,7 +27,7 @@ public:
     Client(Server& server, ICallback& callback);
     ~Client();
 
-    bool accept(Server::Handle& handle);
+    bool accept(const Address& proxy, Server::Handle& listener);
 
 public: // Connection::ICallback
     virtual void onOpened() {}
@@ -38,12 +39,10 @@ public: // Connection::ICallback
 public: // DirectLine::ICallback
     virtual void onOpened(DirectLine&);
     virtual void onClosed(DirectLine&);
-    virtual void onAbolished(DirectLine&);
 
 public: // ProxyLine::ICallback
     virtual void onOpened(ProxyLine&);
     virtual void onClosed(ProxyLine&);
-    virtual void onAbolished(ProxyLine&);
 
 public:
     Server& _server;

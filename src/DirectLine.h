@@ -2,6 +2,7 @@
 #pragma once
 
 #include "Connection.h"
+#include "Address.h"
 
 class Server;
 
@@ -13,7 +14,6 @@ public:
     public:
         virtual void onOpened(DirectLine&) = 0;
         virtual void onClosed(DirectLine&) = 0;
-        virtual void onAbolished(DirectLine&) = 0;
 
     protected:
         ICallback() {}
@@ -24,7 +24,7 @@ public:
     DirectLine(Server& server, Server::Handle& client, ICallback& callback);
     ~DirectLine();
 
-    bool connect(uint32 addr, uint16 port);
+    bool connect(const Address& address);
 
     Server::Handle* getHandle() const {return _handle;}
 
