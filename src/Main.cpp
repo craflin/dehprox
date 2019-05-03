@@ -1,52 +1,40 @@
 
 #include <nstd/Log.h>
-#include <nstd/Socket/Socket.h>
+#include <nstd/Thread.h>
 
-#include "Listener.h"
-#include "Connection.h"
+#include "ProxyServer.h"
+#include "DnsServer.h"
 
 int main()
 {
-    Address proxy;
-    proxy.addr = Socket::loopbackAddr;
-    proxy.port = 3129;
-    Address listen;
-    listen.addr = Socket::anyAddr;
-    listen.port = 62124;
+    Address proxyUplink;
+    proxyUplink.addr = Socket::loopbackAddr;
+    proxyUplink.port = 3129;
+    Address proxyListen;
+    proxyListen.addr = Socket::anyAddr;
+    proxyListen.port = 62124;
+    Address dnsListen;
+    dnsListen.addr = Socket::anyAddr;
+    dnsListen.port = 53;
 
+    // start dns server
+    DnsServer dnsServer;
+    if (!dnsServer.start(dnsListen))
+        return Log::errorf("Could not start DNS server on UDP port %s:%hu: %s", (const char*)Socket::inetNtoA(proxyListen.addr), (uint16)proxyListen.port, (const char*)Socket::getErrorString()), 1;
+    Log::infof("Listening on port %hu...", (uint16)dnsListen.port);
 
-    Server server;
-    server.setKeepAlive(true);
-    server.setNoDelay(true);
-    Listener listener(server, proxy);
-    if(!server.listen(listen.addr, listen.port, nullptr))
-    {
-        Log::errorf("Could not listen on port %hu: %s", (uint16)listen.port, (const char*)Socket::getErrorString());
-        return 1;
-    }
-    Log::infof("Listening on port %hu...", (uint16)listen.port);
-    for(Server::Event event; server.poll(event);)
-        switch(event.type)
-        {
-        case Server::Event::failType:
-            ((Connection::ICallback*)event.userData)->onAbolished();
-            break;
-        case Server::Event::openType:
-            ((Connection::ICallback*)event.userData)->onOpened();
-            break;
-        case Server::Event::readType:
-            ((Connection::ICallback*)event.userData)->onRead();
-            break;
-        case Server::Event::writeType:
-            ((Connection::ICallback*)event.userData)->onWrite();
-            break;
-        case Server::Event::closeType:
-            ((Connection::ICallback*)event.userData)->onClosed();
-            break;
-        case Server::Event::acceptType:
-            listener.accept(*event.handle);
-            break;
-        }
-    Log::errorf("Could not run poll loop: %s", (const char*)Socket::getErrorString());
-    return 0;
+    // start transparent proxy server
+    ProxyServer proxyServer;
+    if (!proxyServer.start(proxyListen, proxyUplink))
+        return Log::errorf("Could not start proxy server on TCP port %s:%hu: %s", (const char*)Socket::inetNtoA(proxyListen.addr), (uint16)proxyListen.port, (const char*)Socket::getErrorString()), 1;
+    Log::infof("Listening on port %hu...", (uint16)proxyListen.port);
+
+    // run dns server
+    Thread dnsThread;
+    if (!dnsThread.start(dnsServer, &DnsServer::run))
+        return Log::errorf("Could not start thread: %s", (const char*)Socket::getErrorString()), 1;
+
+    // run transparent proxy server
+    proxyServer.run();
+    return 1;
 }

@@ -6,13 +6,15 @@ set(sources
     Connection.h
     DirectLine.cpp
     DirectLine.h
+    DnsServer.cpp
+    DnsServer.h
     Hostname.cpp
     Hostname.h
-    Listener.cpp
-    Listener.h
     Main.cpp
     ProxyLine.cpp
     ProxyLine.h
+    ProxyServer.cpp
+    ProxyServer.h
 )
 
 add_executable(dehprox
