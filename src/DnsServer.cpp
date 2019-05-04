@@ -9,6 +9,8 @@
 
 #include <cstring>
 
+#include <nstd/Log.h>
+
 #include "Hostname.h"
 
 namespace {
@@ -95,7 +97,7 @@ bool appendAnswer(const byte*& pos, const byte* end, const DnsQuestion& question
     answer->answerType = htons(question.queryType);
     answer->answerClass = htons(question.queryClass);
     answer->validityTime = htonl(600);
-    answer->len = sizeof(uint32);
+    answer->len = htons(sizeof(uint32));
     answer->addr = htonl(addr);
     pos += sizeof(DnsAnswer);
     return true;
@@ -106,6 +108,7 @@ bool appendAnswer(const byte*& pos, const byte* end, const DnsQuestion& question
 bool DnsServer::start(const Address& address)
 {
     if (!_socket.open(Socket::udpProtocol) ||
+        !_socket.setReuseAddress() ||
         !_socket.bind(address.addr, address.port))
         return false;
     return true;
@@ -144,25 +147,27 @@ uint DnsServer::run()
             {
                 const byte* pointerPos = pos;
                 DnsQuestion question;
-                if (!parseQuestion(pos, end, hostname,question))
+                if (!parseQuestion(pos, end, hostname, question))
                     goto ignoreRequest;
 
                 uint32 addr;
                 if (!Hostname::resolve(hostname, addr))
                     addr = Hostname::resolveFake(hostname);
 
+                Log::infof("%s:%hu: Answered DNS query for %s with %s", (const char*)Socket::inetNtoA(sender.addr), sender.port, (const char*)hostname, (const char*)Socket::inetNtoA(addr));
+
                 if (!appendAnswer(responsePos, responseEnd, question, pointerPos - query, addr))
                     goto ignoreRequest;
             }
             // create response header
-            memcpy(response, query, querySize);
+            memcpy(responseHeader, query, querySize);
             responseHeader->flags = htons(flags | DNS_QR_BIT | DNS_RA_BIT);
             responseHeader->answerCount = responseHeader->questionCount;
             responseHeader->nameServerRecordCount = 0;
             responseHeader->additionalRecordCount = 0;
 
             // send response
-            _socket.sendTo(response, responsePos - response, sender.addr, sender.port);
+            _socket.sendTo((byte*)responseHeader, responsePos - (byte*)responseHeader, sender.addr, sender.port);
         }
     ignoreRequest:;
     }

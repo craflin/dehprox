@@ -3,6 +3,7 @@
 
 ProxyServer::ProxyServer()
 {
+    _server.setReuseAddress(true);
     _server.setKeepAlive(true);
     _server.setNoDelay(true);
 }

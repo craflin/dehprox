@@ -7,6 +7,7 @@
 #endif
 
 #include <nstd/Socket/Socket.h>
+#include <nstd/Log.h>
 
 #include "Hostname.h"
 #include "DirectLine.h"
@@ -17,12 +18,13 @@ bool getOriginalDst(Socket& s, uint32& addr, uint16& port)
 #ifdef _WIN32
     return s.getSockName(addr, port);
 #else
-   sockaddr_in destAddr;
+    sockaddr_in destAddr;
     usize destAddrLen = sizeof(destAddr);
     if(!s.getSockOpt(SOL_IP, SO_ORIGINAL_DST, &destAddr, destAddrLen))
         return false;
     addr = ntohl(destAddr.sin_addr.s_addr);
     port = ntohs(destAddr.sin_port);
+    return true;
 #endif
 }
 
@@ -40,35 +42,46 @@ Client::Client(Server& server, ICallback& callback)
 Client::~Client()
 {
     if (_handle)
+    {
         _server.close(*_handle);
+
+        Log::infof("%s:%hu: Closed client for %s:%hu (%s)", (const char*)Socket::inetNtoA(_address.addr), _address.port, 
+            (const char*)Socket::inetNtoA(_destination.addr), _destination.port, (const char*)_destinationHostname);
+    }
     delete _proxyLine;
     delete _directLine;
 }
 
 bool Client::accept(const Address& proxy, Server::Handle& listener)
 {
-    Address address;
-    _handle = _server.accept(listener, this, &address.addr, &address.port, true);
+    _handle = _server.accept(listener, this, &_address.addr, &_address.port, true);
     if (!_handle)
         return false;
     Socket* clientSocket = _server.getSocket(*_handle);
     if (!clientSocket ||
-        !getOriginalDst(*clientSocket, address.addr, address.port))
+        !getOriginalDst(*clientSocket, _destination.addr, _destination.port))
         return false;
 
-    String hostname;
-    if (!Hostname::reverseResolveFake(address.addr, hostname))
+    bool connectDirect = false;
+    if (!Hostname::reverseResolveFake(_destination.addr, _destinationHostname))
+    {
+        connectDirect = true;
+        if (!Hostname::reverseResolve(_destination.addr, _destinationHostname))
+            _destinationHostname = Socket::inetNtoA(_destination.addr);
+    }
+
+    Log::infof("%s:%hu: Accepted client for %s:%hu (%s)", (const char*)Socket::inetNtoA(_address.addr), _address.port, 
+        (const char*)Socket::inetNtoA(_destination.addr), _destination.port, (const char*)_destinationHostname);
+
+    if (connectDirect)
     {
         _directLine = new DirectLine(_server, *_handle, *this);
-        if (!_directLine->connect(address))
+        if (!_directLine->connect(_destination))
             return false;
-
-        if (!Hostname::reverseResolve(address.addr, hostname))
-            hostname = Socket::inetNtoA(address.addr);
     }
 
     _proxyLine = new ProxyLine(_server, *_handle, *this);
-    if (!_proxyLine->connect(proxy, hostname, address.port))
+    if (!_proxyLine->connect(proxy, _destinationHostname, _destination.port))
         return false;
 
     return true;
@@ -106,6 +119,8 @@ void Client::onOpened(DirectLine&)
         delete _proxyLine;
         _proxyLine = nullptr;
     }
+   Log::infof("%s:%hu: Established direct connection with %s:%hu (%s)", (const char*)Socket::inetNtoA(_address.addr), _address.port, 
+        (const char*)Socket::inetNtoA(_destination.addr), _destination.port, (const char*)_destinationHostname);
 }
 
 void Client::onClosed(DirectLine&)
@@ -124,6 +139,8 @@ void Client::onOpened(ProxyLine&)
         delete _directLine;
         _directLine = nullptr;
     }
+   Log::infof("%s:%hu: Established proxy connection with %s:%hu (%s)", (const char*)Socket::inetNtoA(_address.addr), _address.port, 
+        (const char*)Socket::inetNtoA(_destination.addr), _destination.port, (const char*)_destinationHostname);
 }
 
 void Client::onClosed(ProxyLine&)

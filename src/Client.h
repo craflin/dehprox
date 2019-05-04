@@ -51,5 +51,8 @@ public:
     ProxyLine* _proxyLine;
     DirectLine* _directLine;
     Server::Handle* _activeLine;
+    Address _address;
+    Address _destination;
+    String _destinationHostname;
 };
 
