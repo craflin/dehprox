@@ -119,8 +119,9 @@ void Client::onOpened(DirectLine&)
         delete _proxyLine;
         _proxyLine = nullptr;
     }
-   Log::infof("%s:%hu: Established direct connection with %s:%hu (%s)", (const char*)Socket::inetNtoA(_address.addr), _address.port, 
-        (const char*)Socket::inetNtoA(_destination.addr), _destination.port, (const char*)_destinationHostname);
+    Log::infof("%s:%hu: Established direct connection with %s:%hu", (const char*)Socket::inetNtoA(_address.addr), _address.port, 
+        (const char*)_destinationHostname, _destination.port);
+    _server.resume(*_handle);
 }
 
 void Client::onClosed(DirectLine&)
@@ -139,8 +140,9 @@ void Client::onOpened(ProxyLine&)
         delete _directLine;
         _directLine = nullptr;
     }
-   Log::infof("%s:%hu: Established proxy connection with %s:%hu (%s)", (const char*)Socket::inetNtoA(_address.addr), _address.port, 
-        (const char*)Socket::inetNtoA(_destination.addr), _destination.port, (const char*)_destinationHostname);
+    Log::infof("%s:%hu: Established proxy connection with %s:%hu", (const char*)Socket::inetNtoA(_address.addr), _address.port, 
+        (const char*)_destinationHostname, _destination.port);
+    _server.resume(*_handle);
 }
 
 void Client::onClosed(ProxyLine&)
