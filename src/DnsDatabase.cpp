@@ -110,7 +110,7 @@ uint32 DnsDatabase::resolveFake(const String& hostname)
             {
                 if (i == 200)
                 {
-                    fakeAddr = Time::microTicks(); // add true randomness after 200 failed unique addr generation attempts
+                    fakeAddr = (uint32)Time::microTicks(); // add true randomness after 200 failed unique addr generation attempts
                     i = 0;
                 }
                 fakeAddr *= 16807;
