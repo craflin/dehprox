@@ -96,7 +96,7 @@ bool appendAnswer(const byte*& pos, const byte* end, const DnsQuestion& question
     answer->name = htons(offset | 0xc000);
     answer->answerType = htons(question.queryType);
     answer->answerClass = htons(question.queryClass);
-    answer->validityTime = htonl(600);
+    answer->validityTime = htonl(10 * 60); // 10 minutes
     answer->len = htons(sizeof(uint32));
     answer->addr = htonl(addr);
     pos += sizeof(DnsAnswer);
