@@ -45,7 +45,7 @@ Client::~Client()
     {
         _server.close(*_handle);
 
-        Log::infof("%s:%hu: Closed client for %s:%hu (%s)", (const char*)Socket::inetNtoA(_address.addr), _address.port, 
+        Log::infof("%s: Closed client for %s:%hu (%s)", (const char*)Socket::inetNtoA(_address.addr),
             (const char*)Socket::inetNtoA(_destination.addr), _destination.port, (const char*)_destinationHostname);
     }
     delete _proxyLine;
@@ -74,7 +74,7 @@ bool Client::accept(const Address& proxy, Server::Handle& listener)
             _destinationHostname = Socket::inetNtoA(_destination.addr);
     }
 
-    Log::infof("%s:%hu: Accepted client for %s:%hu (%s)", (const char*)Socket::inetNtoA(_address.addr), _address.port, 
+    Log::infof("%s: Accepted client for %s:%hu (%s)", (const char*)Socket::inetNtoA(_address.addr),
         (const char*)Socket::inetNtoA(_destination.addr), _destination.port, (const char*)_destinationHostname);
 
     if (directConnect)
@@ -123,7 +123,7 @@ void Client::onOpened(DirectLine&)
     _activeLine = _directLine->getHandle();
     delete _proxyLine;
     _proxyLine = nullptr;
-    Log::infof("%s:%hu: Established direct connection with %s:%hu", (const char*)Socket::inetNtoA(_address.addr), _address.port, 
+    Log::infof("%s: Established direct connection with %s:%hu", (const char*)Socket::inetNtoA(_address.addr),
         (const char*)_destinationHostname, _destination.port);
     _server.resume(*_handle);
 }
@@ -141,7 +141,7 @@ void Client::onOpened(ProxyLine&)
     _activeLine = _proxyLine->getHandle();
     delete _directLine;
     _directLine = nullptr;
-    Log::infof("%s:%hu: Established proxy connection with %s:%hu", (const char*)Socket::inetNtoA(_address.addr), _address.port, 
+    Log::infof("%s: Established proxy connection with %s:%hu", (const char*)Socket::inetNtoA(_address.addr),
         (const char*)_destinationHostname, _destination.port);
     _server.resume(*_handle);
 }
