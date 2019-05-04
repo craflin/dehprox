@@ -151,10 +151,14 @@ uint DnsServer::run()
                     goto ignoreRequest;
 
                 uint32 addr;
+                bool isFakeAddr = false;
                 if (!Hostname::resolve(hostname, addr))
+                {
                     addr = Hostname::resolveFake(hostname);
+                    isFakeAddr = true;
+                }
 
-                Log::infof("%s:%hu: Answered DNS query for %s with %s", (const char*)Socket::inetNtoA(sender.addr), sender.port, (const char*)hostname, (const char*)Socket::inetNtoA(addr));
+                Log::infof("%s:%hu: Answered DNS query for %s with %s%s", (const char*)Socket::inetNtoA(sender.addr), sender.port, (const char*)hostname, (const char*)Socket::inetNtoA(addr), isFakeAddr ? " (surrogate)" : "");
 
                 if (!appendAnswer(responsePos, responseEnd, question, pointerPos - query, addr))
                     goto ignoreRequest;

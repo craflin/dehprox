@@ -22,7 +22,7 @@ Mutex _mutex;
 HashMap<String, AddrInfo> _nameToAddr(2000);
 HashMap<uint32, String> _addrToName(2000);
 
-void _cleanupFakeAddresses()
+void _cleanupAddresses()
 {
     int64 now = Time::time();
     while (!_nameToAddr.isEmpty())
@@ -40,22 +40,38 @@ void _cleanupFakeAddresses()
 
 }
 
-
 bool Hostname::resolve(const String& hostname, uint32& addr)
 {
-    // todo
-    return false;
+   if (!Socket::getHostByName(hostname, addr))
+        return false;
+
+    {
+        _mutex.lock();
+        HashMap<String, AddrInfo>::Iterator it = _nameToAddr.find(hostname);
+        if (it != _nameToAddr.end())
+        {
+            // reset timestamp of stored addr info
+            _nameToAddr.remove(it);
+            AddrInfo addrInfo = {addr, Time::time()};
+            _nameToAddr.append(hostname, addrInfo);
+        }
+        else
+        {
+            // add stored addr info
+            AddrInfo addrInfo = {addr, Time::time()};
+            _nameToAddr.append(hostname, addrInfo);
+            _addrToName.append(addr, hostname);
+        }
+        _mutex.unlock();
+    }
+
+    return true;
 }
 
 bool Hostname::reverseResolve(uint32 addr, String& hostname)
 {
-
-    // todo
-    return false;
-}
-
-bool Hostname::reverseResolveFake(uint32 addr, String& hostname)
-{
+    if ((addr & FAKE_ADDR_SUBNET_MASK) == FAKE_ADDR_SUBNET)
+        return false;
     bool result = false;
     {
         _mutex.lock();
@@ -64,17 +80,8 @@ bool Hostname::reverseResolveFake(uint32 addr, String& hostname)
         {
             result = true;
             hostname = *it;
-
-            // reset timestamp of stored addr
-            HashMap<String, AddrInfo>::Iterator it = _nameToAddr.find(hostname);
-            if (it != _nameToAddr.end())
-            {
-                _nameToAddr.remove(it);
-                AddrInfo addrInfo = {addr, Time::time()};
-                _nameToAddr.append(hostname, addrInfo);
-            }
         }
-        _cleanupFakeAddresses();
+        _cleanupAddresses();
         _mutex.unlock();
     }
     return result;
@@ -125,4 +132,23 @@ uint32 Hostname::resolveFake(const String& hostname)
     }
 
     return fakeAddr;
+}
+
+bool Hostname::reverseResolveFake(uint32 addr, String& hostname)
+{
+    if ((addr & FAKE_ADDR_SUBNET_MASK) != FAKE_ADDR_SUBNET)
+        return false;
+    bool result = false;
+    {
+        _mutex.lock();
+        HashMap<uint32, String>::Iterator it = _addrToName.find(addr);
+        if (it != _addrToName.end())
+        {
+            result = true;
+            hostname = *it;
+        }
+        _cleanupAddresses();
+        _mutex.unlock();
+    }
+    return result;
 }
