@@ -50,17 +50,12 @@ bool DnsDatabase::resolve(const String& hostname, uint32& addr)
         if (it != _nameToAddr.end())
         {
             // reset timestamp of stored addr info
+            _addrToName.remove(it->addr);
             _nameToAddr.remove(it);
-            AddrInfo addrInfo = {addr, Time::time()};
-            _nameToAddr.append(hostname, addrInfo);
         }
-        else
-        {
-            // add stored addr info
-            AddrInfo addrInfo = {addr, Time::time()};
-            _nameToAddr.append(hostname, addrInfo);
-            _addrToName.append(addr, hostname);
-        }
+        AddrInfo addrInfo = {addr, Time::time()};
+        _nameToAddr.append(hostname, addrInfo);
+        _addrToName.append(addr, hostname);
         _mutex.unlock();
     }
 
