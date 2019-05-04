@@ -62,10 +62,14 @@ bool Client::accept(const Address& proxy, Server::Handle& listener)
         !getOriginalDst(*clientSocket, _destination.addr, _destination.port))
         return false;
 
-    bool connectDirect = false;
-    if (!DnsDatabase::reverseResolveFake(_destination.addr, _destinationHostname))
+    bool directConnect = false;
+    bool proxyConnect = false;
+    if (DnsDatabase::reverseResolveFake(_destination.addr, _destinationHostname))
+        proxyConnect = true;
+    else if (!DnsDatabase::isFake(_destination.addr))
     {
-        connectDirect = true;
+        directConnect = true;
+        proxyConnect = true;
         if (!DnsDatabase::reverseResolve(_destination.addr, _destinationHostname))
             _destinationHostname = Socket::inetNtoA(_destination.addr);
     }
@@ -73,16 +77,19 @@ bool Client::accept(const Address& proxy, Server::Handle& listener)
     Log::infof("%s:%hu: Accepted client for %s:%hu (%s)", (const char*)Socket::inetNtoA(_address.addr), _address.port, 
         (const char*)Socket::inetNtoA(_destination.addr), _destination.port, (const char*)_destinationHostname);
 
-    if (connectDirect)
+    if (directConnect)
     {
         _directLine = new DirectLine(_server, *_handle, *this);
         if (!_directLine->connect(_destination))
             return false;
     }
 
-    _proxyLine = new ProxyLine(_server, *_handle, *this);
-    if (!_proxyLine->connect(proxy, _destinationHostname, _destination.port))
-        return false;
+    if (proxyConnect)
+    {
+        _proxyLine = new ProxyLine(_server, *_handle, *this);
+        if (!_proxyLine->connect(proxy, _destinationHostname, _destination.port))
+            return false;
+    }
 
     return true;
 }

@@ -12,5 +12,7 @@ public:
 
     static uint32 resolveFake(const String& hostname);
 
+    static bool isFake(uint32 addr);
+
     static bool reverseResolveFake(uint32 addr, String& hostname);
 };

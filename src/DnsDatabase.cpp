@@ -133,6 +133,11 @@ uint32 DnsDatabase::resolveFake(const String& hostname)
     return fakeAddr;
 }
 
+bool DnsDatabase::isFake(uint32 addr)
+{
+    return (addr & FAKE_ADDR_SUBNET_MASK) == FAKE_ADDR_SUBNET;
+}
+
 bool DnsDatabase::reverseResolveFake(uint32 addr, String& hostname)
 {
     if ((addr & FAKE_ADDR_SUBNET_MASK) != FAKE_ADDR_SUBNET)
