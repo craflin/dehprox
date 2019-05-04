@@ -52,29 +52,26 @@ void ProxyLine::onRead()
     else
     {
         buffer[size] = '\0';
+        _proxyResponse.append((const char*)buffer, size);
         // expecting "HTTP/1.1 200 Connection established\r\n\r\n"
-        const char* headerEnd = String::find((const char*)buffer, "\r\n\r\n");
+        const char* headerEnd = _proxyResponse.find("\r\n\r\n");
         if (headerEnd)
         {
-            if (String::compare((const char*)buffer, "HTTP/1.1 200 ", 13) == 0)
+            if (_proxyResponse.compare("HTTP/1.1 200 ", 13) == 0)
             {
-                const byte* bufferPos = (const byte*)headerEnd + 4;
-                usize remainingSize = size - (bufferPos - buffer);
+                const char* bufferPos = headerEnd + 4;
+                usize remainingSize = _proxyResponse.length() - (bufferPos - (const char*)_proxyResponse);
+                if (remainingSize)
+                    _server.write(_client, (const byte*)bufferPos, remainingSize);
+                _proxyResponse = String();
                 _connected = true;
                 _callback.onOpened(*this);
-                if (remainingSize)
-                    _server.write(_client, bufferPos, remainingSize);
             }
             else
                 _callback.onClosed(*this);
         }
-        else
-        {
-            //if(size > 128)
-                _callback.onClosed(*this);
-            //else
-                //_server.unread(*_handle, buffer, size); // todo
-        }
+        else if(_proxyResponse.length() > 128)
+            _callback.onClosed(*this);
     }
 }
 

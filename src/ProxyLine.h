@@ -45,4 +45,5 @@ private:
     String _hostname;
     uint16 _port;
     bool _connected;
+    String _proxyResponse;
 };
