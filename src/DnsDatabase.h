@@ -3,7 +3,7 @@
 
 #include <nstd/String.h>
 
-class Hostname
+class DnsDatabase
 {
 public:
     static bool resolve(const String& hostname, uint32& addr);

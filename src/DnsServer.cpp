@@ -11,7 +11,7 @@
 
 #include <nstd/Log.h>
 
-#include "Hostname.h"
+#include "DnsDatabase.h"
 
 namespace {
 
@@ -152,9 +152,9 @@ uint DnsServer::run()
 
                 uint32 addr;
                 bool isFakeAddr = false;
-                if (!Hostname::resolve(hostname, addr))
+                if (!DnsDatabase::resolve(hostname, addr))
                 {
-                    addr = Hostname::resolveFake(hostname);
+                    addr = DnsDatabase::resolveFake(hostname);
                     isFakeAddr = true;
                 }
 

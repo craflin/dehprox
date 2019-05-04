@@ -1,5 +1,5 @@
 
-#include "Hostname.h"
+#include "DnsDatabase.h"
 
 #include <nstd/Socket/Socket.h>
 #include <nstd/Mutex.h>
@@ -8,7 +8,6 @@
 
 #define FAKE_ADDR_SUBNET 0x64400000 // "Shared Address Space for Service Providers"
 #define FAKE_ADDR_SUBNET_MASK (~(0xffffffff >> 10))
-
 
 namespace {
 
@@ -40,7 +39,7 @@ void _cleanupAddresses()
 
 }
 
-bool Hostname::resolve(const String& hostname, uint32& addr)
+bool DnsDatabase::resolve(const String& hostname, uint32& addr)
 {
    if (!Socket::getHostByName(hostname, addr))
         return false;
@@ -68,7 +67,7 @@ bool Hostname::resolve(const String& hostname, uint32& addr)
     return true;
 }
 
-bool Hostname::reverseResolve(uint32 addr, String& hostname)
+bool DnsDatabase::reverseResolve(uint32 addr, String& hostname)
 {
     if ((addr & FAKE_ADDR_SUBNET_MASK) == FAKE_ADDR_SUBNET)
         return false;
@@ -87,7 +86,7 @@ bool Hostname::reverseResolve(uint32 addr, String& hostname)
     return result;
 }
 
-uint32 Hostname::resolveFake(const String& hostname)
+uint32 DnsDatabase::resolveFake(const String& hostname)
 {
     uint32 fakeAddr;
 
@@ -134,7 +133,7 @@ uint32 Hostname::resolveFake(const String& hostname)
     return fakeAddr;
 }
 
-bool Hostname::reverseResolveFake(uint32 addr, String& hostname)
+bool DnsDatabase::reverseResolveFake(uint32 addr, String& hostname)
 {
     if ((addr & FAKE_ADDR_SUBNET_MASK) != FAKE_ADDR_SUBNET)
         return false;

@@ -9,7 +9,7 @@
 #include <nstd/Socket/Socket.h>
 #include <nstd/Log.h>
 
-#include "Hostname.h"
+#include "DnsDatabase.h"
 #include "DirectLine.h"
 #include "ProxyLine.h"
 
@@ -63,10 +63,10 @@ bool Client::accept(const Address& proxy, Server::Handle& listener)
         return false;
 
     bool connectDirect = false;
-    if (!Hostname::reverseResolveFake(_destination.addr, _destinationHostname))
+    if (!DnsDatabase::reverseResolveFake(_destination.addr, _destinationHostname))
     {
         connectDirect = true;
-        if (!Hostname::reverseResolve(_destination.addr, _destinationHostname))
+        if (!DnsDatabase::reverseResolve(_destination.addr, _destinationHostname))
             _destinationHostname = Socket::inetNtoA(_destination.addr);
     }
 

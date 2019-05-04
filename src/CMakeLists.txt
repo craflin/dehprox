@@ -6,10 +6,10 @@ set(sources
     Connection.h
     DirectLine.cpp
     DirectLine.h
+    DnsDatabase.cpp
+    DnsDatabase.h
     DnsServer.cpp
     DnsServer.h
-    Hostname.cpp
-    Hostname.h
     Main.cpp
     ProxyLine.cpp
     ProxyLine.h
