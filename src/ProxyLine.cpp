@@ -52,10 +52,11 @@ void ProxyLine::onRead()
     else
     {
         buffer[size] = '\0';
+        // expecting "HTTP/1.1 200 Connection established\r\n\r\n"
         const char* headerEnd = String::find((const char*)buffer, "\r\n\r\n");
         if (headerEnd)
         {
-            if (String::compare((const char*)buffer, "200 OK", 6) == 0)
+            if (String::compare((const char*)buffer, "HTTP/1.1 200 ", 13) == 0)
             {
                 const byte* bufferPos = (const byte*)headerEnd + 4;
                 usize remainingSize = size - (bufferPos - buffer);

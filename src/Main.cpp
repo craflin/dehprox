@@ -9,7 +9,7 @@ int main()
 {
     Address proxyUplink;
     proxyUplink.addr = Socket::loopbackAddr;
-    proxyUplink.port = 3129;
+    proxyUplink.port = 3128;
     Address proxyListen;
     proxyListen.addr = Socket::anyAddr;
     proxyListen.port = 62124;
