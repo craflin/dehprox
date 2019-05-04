@@ -3,7 +3,11 @@
 
 #ifdef _WIN32
 #include <WinSock2.h>
+#else
+#include <arpa/inet.h>
 #endif
+
+#include <cstring>
 
 #include "Hostname.h"
 
@@ -132,32 +136,34 @@ uint DnsServer::run()
         for (uint16 i = 0; i < questionCount; ++i)
             if (!skipQuestion(pos, end))
                 goto ignoreRequest;
-        usize querySize = end - query;
-        const byte* responsePos = response + querySize;
-        pos = (const byte*)(queryHeader + 1);
-        for (uint16 i = 0; i < questionCount; ++i)
         {
-            const byte* pointerPos = pos;
-            DnsQuestion question;
-            if (!parseQuestion(pos, end, hostname,question))
-                goto ignoreRequest;
+            usize querySize = end - query;
+            const byte* responsePos = response + querySize;
+            pos = (const byte*)(queryHeader + 1);
+            for (uint16 i = 0; i < questionCount; ++i)
+            {
+                const byte* pointerPos = pos;
+                DnsQuestion question;
+                if (!parseQuestion(pos, end, hostname,question))
+                    goto ignoreRequest;
 
-            uint32 addr;
-            if (!Hostname::resolve(hostname, addr))
-                addr = Hostname::resolveFake(hostname);
+                uint32 addr;
+                if (!Hostname::resolve(hostname, addr))
+                    addr = Hostname::resolveFake(hostname);
 
-            if (!appendAnswer(responsePos, responseEnd, question, pointerPos - query, addr))
-                goto ignoreRequest;
+                if (!appendAnswer(responsePos, responseEnd, question, pointerPos - query, addr))
+                    goto ignoreRequest;
+            }
+            // create response header
+            memcpy(response, query, querySize);
+            responseHeader->flags = htons(flags | DNS_QR_BIT | DNS_RA_BIT);
+            responseHeader->answerCount = responseHeader->questionCount;
+            responseHeader->nameServerRecordCount = 0;
+            responseHeader->additionalRecordCount = 0;
+
+            // send response
+            _socket.sendTo(response, responsePos - response, sender.addr, sender.port);
         }
-        // create response header
-        memcpy(response, query, querySize);
-        responseHeader->flags = htons(flags | DNS_QR_BIT | DNS_RA_BIT);
-        responseHeader->answerCount = responseHeader->questionCount;
-        responseHeader->nameServerRecordCount = 0;
-        responseHeader->additionalRecordCount = 0;
-
-        // send response
-        _socket.sendTo(response, responsePos - response, sender.addr, sender.port);
     ignoreRequest:;
     }
     return 1;
