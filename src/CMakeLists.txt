@@ -15,6 +15,8 @@ set(sources
     ProxyLine.h
     ProxyServer.cpp
     ProxyServer.h
+    Settings.cpp
+    Settings.h
 )
 
 add_executable(dehprox
