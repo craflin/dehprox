@@ -7,7 +7,7 @@
 
 struct Settings
 {
-    Address proxyAddr;
+    Address httpProxyAddr;
     Address listenAddr;
     Address dnsListenAddr;
     bool autoProxySkip;

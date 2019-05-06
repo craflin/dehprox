@@ -23,7 +23,7 @@ bool ProxyLine::connect(const String& hostname, int16 port)
 {
     _hostname = hostname;
     _port = port;
-    _handle = _server.connect(_settings.proxyAddr.addr, _settings.proxyAddr.port, this);
+    _handle = _server.connect(_settings.httpProxyAddr.addr, _settings.httpProxyAddr.port, this);
     if (!_handle)
         return false;
     return true;

@@ -7,8 +7,8 @@
 
 Settings::Settings() : autoProxySkip(true)
 {
-    proxyAddr.addr = Socket::loopbackAddr;
-    proxyAddr.port = 3128;
+    httpProxyAddr.addr = Socket::loopbackAddr;
+    httpProxyAddr.port = 3128;
     listenAddr.port = 62124;
     dnsListenAddr.port = 62124;
 }
@@ -35,8 +35,8 @@ void Settings::loadSettings(const String& file, Settings& settings)
             continue;
         const String& option = *tokens.begin();
         const String& value = *(++tokens.begin());
-        if (option == "proxyAddr")
-            settings.proxyAddr.addr = Socket::inetAddr(value, &settings.proxyAddr.port);
+        if (option == "httpProxyAddr")
+            settings.httpProxyAddr.addr = Socket::inetAddr(value, &settings.httpProxyAddr.port);
         else if (option == "listenAddr")
             settings.listenAddr.addr = Socket::inetAddr(value, &settings.listenAddr.port);
         else if (option == "dnsListenAddr")

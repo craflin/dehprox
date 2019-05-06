@@ -19,8 +19,8 @@ int main()
     // start transparent proxy server
     ProxyServer proxyServer(settings);
     if (!proxyServer.start())
-        return Log::errorf("Could not start proxy server on TCP port %s:%hu: %s", (const char*)Socket::inetNtoA(settings.proxyAddr.addr), (uint16)settings.proxyAddr.port, (const char*)Socket::getErrorString()), 1;
-    Log::infof("Listening on TCP port %hu...", (uint16)settings.proxyAddr.port);
+        return Log::errorf("Could not start proxy server on TCP port %s:%hu: %s", (const char*)Socket::inetNtoA(settings.listenAddr.addr), (uint16)settings.listenAddr.port, (const char*)Socket::getErrorString()), 1;
+    Log::infof("Listening on TCP port %hu...", (uint16)settings.listenAddr.port);
 
     // run dns server
     Thread dnsThread;
