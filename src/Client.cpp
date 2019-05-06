@@ -28,9 +28,10 @@ bool getOriginalDst(Socket& s, uint32& addr, uint16& port)
 #endif
 }
 
-Client::Client(Server& server, ICallback& callback)
+Client::Client(Server& server, ICallback& callback, const Settings& settings)
     : _server(server)
     , _callback(callback)
+    , _settings(settings)
     , _handle(nullptr)
     , _proxyLine(nullptr)
     , _directLine(nullptr)
@@ -52,7 +53,7 @@ Client::~Client()
     delete _directLine;
 }
 
-bool Client::accept(const Address& proxy, Server::Handle& listener)
+bool Client::accept(Server::Handle& listener)
 {
     _handle = _server.accept(listener, this, &_address.addr, &_address.port, true);
     if (!_handle)
@@ -86,8 +87,8 @@ bool Client::accept(const Address& proxy, Server::Handle& listener)
 
     if (proxyConnect)
     {
-        _proxyLine = new ProxyLine(_server, *_handle, *this);
-        if (!_proxyLine->connect(proxy, _destinationHostname, _destination.port))
+        _proxyLine = new ProxyLine(_server, *_handle, *this, _settings);
+        if (!_proxyLine->connect(_destinationHostname, _destination.port))
             return false;
     }
 

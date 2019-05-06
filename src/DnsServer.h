@@ -8,10 +8,13 @@
 class DnsServer
 {
 public:
-    bool start(const Address& address);
+    DnsServer(const Address& address) : _address(address) {}
+
+    bool start();
 
     uint run();
 
 private:
+    const Address& _address;
     Socket _socket;
 };

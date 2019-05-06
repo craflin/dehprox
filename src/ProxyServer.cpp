@@ -1,17 +1,16 @@
 
 #include "ProxyServer.h"
 
-ProxyServer::ProxyServer()
+ProxyServer::ProxyServer(const Settings& settings) : _settings(settings)
 {
     _server.setReuseAddress(true);
     _server.setKeepAlive(true);
     _server.setNoDelay(true);
 }
 
-bool ProxyServer::start(const Address& address, const Address& proxy)
+bool ProxyServer::start()
 {
-    _proxy = proxy;
-    if (!_server.listen(address.addr, address.port, nullptr))
+    if (!_server.listen(_settings.listenAddr.addr, _settings.listenAddr.port, nullptr))
         return false;
     return true;
 }
@@ -45,8 +44,8 @@ uint ProxyServer::run()
 
 void ProxyServer::accept(Server::Handle& listener)
 {
-    Client* client = new Client(_server, *this);
-    if (!client->accept(_proxy, listener))
+    Client* client = new Client(_server, *this, _settings);
+    if (!client->accept(listener))
         delete client;
 }
 

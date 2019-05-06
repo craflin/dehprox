@@ -1,10 +1,11 @@
 
 #include "ProxyLine.h"
 
-ProxyLine::ProxyLine(Server& server, Server::Handle& client, ICallback& callback)
+ProxyLine::ProxyLine(Server& server, Server::Handle& client, ICallback& callback, const Settings& settings)
     : _server(server)
     , _client(client)
     , _callback(callback)
+    , _settings(settings)
     , _handle(nullptr)
     , _port()
     , _connected(false)
@@ -18,11 +19,11 @@ ProxyLine::~ProxyLine()
         _server.close(*_handle);
 }
 
-bool ProxyLine::connect(const Address& proxy, const String& hostname, int16 port)
+bool ProxyLine::connect(const String& hostname, int16 port)
 {
     _hostname = hostname;
     _port = port;
-    _handle = _server.connect(proxy.addr, proxy.port, this);
+    _handle = _server.connect(_settings.proxyAddr.addr, _settings.proxyAddr.port, this);
     if (!_handle)
         return false;
     return true;

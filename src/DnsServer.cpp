@@ -105,11 +105,11 @@ bool appendAnswer(const byte*& pos, const byte* end, const DnsQuestion& question
 
 }
 
-bool DnsServer::start(const Address& address)
+bool DnsServer::start()
 {
     if (!_socket.open(Socket::udpProtocol) ||
         !_socket.setReuseAddress() ||
-        !_socket.bind(address.addr, address.port))
+        !_socket.bind(_address.addr, _address.port))
         return false;
     return true;
 }

@@ -6,7 +6,7 @@
 #include "Connection.h"
 #include "DirectLine.h"
 #include "ProxyLine.h"
-#include "Address.h"
+#include "Settings.h"
 
 class Client : public Connection::ICallback
              , public DirectLine::ICallback
@@ -24,10 +24,10 @@ public:
     };
 
 public:
-    Client(Server& server, ICallback& callback);
+    Client(Server& server, ICallback& callback, const Settings& settings);
     ~Client();
 
-    bool accept(const Address& proxy, Server::Handle& listener);
+    bool accept(Server::Handle& listener);
 
 public: // Connection::ICallback
     virtual void onOpened() {}
@@ -47,6 +47,7 @@ public: // ProxyLine::ICallback
 public:
     Server& _server;
     ICallback& _callback;
+    const Settings& _settings;
     Server::Handle* _handle;
     ProxyLine* _proxyLine;
     DirectLine* _directLine;

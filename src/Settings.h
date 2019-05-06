@@ -7,11 +7,12 @@
 
 struct Settings
 {
-    Address proxyUplink;
-    Address proxyListen;
-    Address dnsListen;
-    bool dnsSurrogate;
+    Address proxyAddr;
+    Address listenAddr;
+    Address dnsListenAddr;
     bool autoProxySkip;
+
+    Settings();
 
     static void loadSettings(const String& file, Settings& settings);
 };
