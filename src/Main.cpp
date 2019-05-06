@@ -26,9 +26,9 @@ int main()
     Log::infof("Listening on TCP port %hu...", (uint16)settings.listenAddr.port);
 
     // run dns server
+    Thread dnsThread;
     if (settings.dnsListenAddr.port)
     {
-        Thread dnsThread;
         if (!dnsThread.start(dnsServer, &DnsServer::run))
             return Log::errorf("Could not start thread: %s", (const char*)Socket::getErrorString()), 1;
     }
