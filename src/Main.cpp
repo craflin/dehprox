@@ -12,9 +12,12 @@ int main()
 
     // start dns server
     DnsServer dnsServer(settings.dnsListenAddr);
-    if (!dnsServer.start())
-        return Log::errorf("Could not start DNS server on UDP port %s:%hu: %s", (const char*)Socket::inetNtoA(settings.dnsListenAddr.addr), (uint16)settings.dnsListenAddr.port, (const char*)Socket::getErrorString()), 1;
-    Log::infof("Listening on UDP port %hu...", (uint16)settings.dnsListenAddr.port);
+    if (settings.dnsListenAddr.port)
+    {
+        if (!dnsServer.start())
+            return Log::errorf("Could not start DNS server on UDP port %s:%hu: %s", (const char*)Socket::inetNtoA(settings.dnsListenAddr.addr), (uint16)settings.dnsListenAddr.port, (const char*)Socket::getErrorString()), 1;
+        Log::infof("Listening on UDP port %hu...", (uint16)settings.dnsListenAddr.port);
+    }
 
     // start transparent proxy server
     ProxyServer proxyServer(settings);
@@ -23,9 +26,12 @@ int main()
     Log::infof("Listening on TCP port %hu...", (uint16)settings.listenAddr.port);
 
     // run dns server
-    Thread dnsThread;
-    if (!dnsThread.start(dnsServer, &DnsServer::run))
-        return Log::errorf("Could not start thread: %s", (const char*)Socket::getErrorString()), 1;
+    if (settings.dnsListenAddr.port)
+    {
+        Thread dnsThread;
+        if (!dnsThread.start(dnsServer, &DnsServer::run))
+            return Log::errorf("Could not start thread: %s", (const char*)Socket::getErrorString()), 1;
+    }
 
     // run transparent proxy server
     proxyServer.run();

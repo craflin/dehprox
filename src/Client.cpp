@@ -69,7 +69,7 @@ bool Client::accept(Server::Handle& listener)
         proxyConnect = true;
     else if (!DnsDatabase::isFake(_destination.addr))
     {
-        directConnect = true;
+        directConnect = _settings.autoProxySkip;
         proxyConnect = true;
         if (!DnsDatabase::reverseResolve(_destination.addr, _destinationHostname))
             _destinationHostname = Socket::inetNtoA(_destination.addr);
