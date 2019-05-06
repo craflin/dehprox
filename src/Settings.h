@@ -1,6 +1,8 @@
 
 #pragma once
 
+#include <nstd/String.h>
+
 #include "Address.h"
 
 struct Settings
@@ -11,6 +13,6 @@ struct Settings
     bool dnsSurrogate;
     bool autoProxySkip;
 
-    static void loadSettings(Settings& settings);
+    static void loadSettings(const String& file, Settings& settings);
 };
 
