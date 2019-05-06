@@ -1,14 +1,65 @@
 
 #include <nstd/Log.h>
 #include <nstd/Thread.h>
+#include <nstd/Process.h>
+#include <nstd/Console.h>
 
 #include "ProxyServer.h"
 #include "DnsServer.h"
 
-int main()
+int main(int argc, char* argv[])
 {
+  String logFile;
+  String configFile("/etc/dehprox.conf");
+
+  // parse parameters
+    {
+        Process::Option options[] = {
+            {'b', "daemon", Process::argumentFlag | Process::optionalFlag},
+            {'c', "config", Process::argumentFlag | Process::optionalFlag},
+            {'h', "help", Process::optionFlag},
+        };
+        Process::Arguments arguments(argc, argv, options);
+        int character;
+        String argument;
+        while(arguments.read(character, argument))
+            switch(character)
+            {
+            case 'b':
+                logFile = argument.isEmpty() ? String("/dev/null") : argument;
+                break;
+             case 'c':
+                configFile = argument;
+                break;
+            case '?':
+                Console::errorf("Unknown option: %s.\n", (const char*)argument);
+                return -1;
+            case ':':
+                Console::errorf("Option %s required an argument.\n", (const char*)argument);
+                return -1;
+            default:
+                Console::errorf("Usage: %s [-b]\n\
+  -b, --daemon[=<file>]   Detach from calling shell and write output to <file>.\n", argv[0]);
+              return -1;
+        }
+    }
+
+    // load settings
     Settings settings;
-    Settings::loadSettings("/etc/dehprox.conf" , settings);
+    Settings::loadSettings(configFile, settings);
+
+    // daemonize process
+#ifndef _WIN32
+    if(!logFile.isEmpty())
+    {
+        Log::infof("Starting as daemon...");
+        if(!Process::daemonize(logFile))
+        {
+            Log::errorf("Could not daemonize process: %s", (const char*)Error::getErrorString());
+            return -1;
+        }
+    }
+#endif
 
     // start dns server
     DnsServer dnsServer(settings.dnsListenAddr);

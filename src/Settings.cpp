@@ -44,7 +44,7 @@ void Settings::loadSettings(const String& file, Settings& settings)
         else if (option == "autoProxySkip")
             settings.autoProxySkip = value.toBool();
         else
-            Log::warningf("Unknown option '%s'", (const char*)option);
+            Log::warningf("Unknown option: %s", (const char*)option);
     }
 }
 
