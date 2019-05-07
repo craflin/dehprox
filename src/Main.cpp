@@ -16,7 +16,7 @@ int main(int argc, char* argv[])
     {
         Process::Option options[] = {
             {'b', "daemon", Process::argumentFlag | Process::optionalFlag},
-            {'c', "config", Process::argumentFlag | Process::optionalFlag},
+            {'c', "config", Process::argumentFlag},
             {'h', "help", Process::optionFlag},
         };
         Process::Arguments arguments(argc, argv, options);
@@ -28,7 +28,7 @@ int main(int argc, char* argv[])
             case 'b':
                 logFile = argument.isEmpty() ? String("/dev/null") : argument;
                 break;
-             case 'c':
+            case 'c':
                 configFile = argument;
                 break;
             case '?':
@@ -38,8 +38,14 @@ int main(int argc, char* argv[])
                 Console::errorf("Option %s required an argument.\n", (const char*)argument);
                 return -1;
             default:
-                Console::errorf("Usage: %s [-b]\n\
-  -b, --daemon[=<file>]   Detach from calling shell and write output to <file>.\n", argv[0]);
+                Console::errorf("Usage: %s [-b] [-c <file>]\n\
+\n\
+    -b, --daemon[=<file>]\n\
+        Detach from calling shell and write output to <file>.\n\
+\n\
+    -c <file>, --config[=<file>]\n\
+        Load configuration from <file>. (Default is /etc/dehprox.conf)\n\
+\n", argv[0]);
               return -1;
         }
     }
