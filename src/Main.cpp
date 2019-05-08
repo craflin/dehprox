@@ -3,6 +3,7 @@
 #include <nstd/Thread.h>
 #include <nstd/Process.h>
 #include <nstd/Console.h>
+#include <nstd/Error.h>
 
 #include "ProxyServer.h"
 #include "DnsServer.h"
