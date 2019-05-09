@@ -28,3 +28,5 @@ target_link_libraries(dehprox PRIVATE
 )
 
 source_group("" FILES ${sources})
+
+install(TARGETS dehprox DESTINATION usr/sbin)

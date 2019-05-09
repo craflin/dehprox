@@ -1,0 +1,73 @@
+#!/bin/sh
+#
+### BEGIN INIT INFO
+# Provides:          dehprox
+# Required-Start:    $network
+# Required-Stop:     $network
+# Default-Start:     2 3 4 5
+# Default-Stop:      0 1 6
+# Short-Description: Transparent DNS and TCP to HTTP proxy redirector
+# Description:       Dehprox accepts DNS and TCP traffic that has been
+#                    redirected from a network interface to dehprox. TCP
+#                    traffic is redirected to a HTTP proxy server and DNS
+#                    queries are answered with a fake address that is mapped
+#                    back to the hostname when establising the connection using
+#                    the HTTP proxy.
+### END INIT INFO
+#
+# DAEMON             Location of the binary
+#
+
+PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
+DAEMON=/usr/sbin/dehprox
+NAME=dehprox
+DESC="Dehrpox DNS and TCP to HTTP proxy redirector"
+
+test -x $DAEMON || exit 0
+
+# Include custom values if available
+if [ -f /etc/default/dehprox ] ; then
+	. /etc/default/dehprox
+fi
+
+DAEMON_OPTS="$DAEMON_OPTS -b"
+
+start() {
+	echo -n "Starting $DESC: "
+
+	$DAEMON -b
+	if [ $? -eq 0 ]; then
+		echo "$NAME."
+	else
+		echo "failed!"
+	fi
+}
+
+stop() {
+	echo -n "Stopping $DESC: "
+	killall $DAEMON
+	if [ $? -eq 0 ]; then
+		echo "$NAME."
+	else
+		echo "failed!"
+	fi
+}
+
+case "$1" in
+	start)
+		start
+		;;
+	stop)
+		stop
+		;;
+	restart|reload|force-reload)
+		stop
+		start
+		;;
+	*)
+		echo "Usage: $0 {start|stop|restart|reload|force-reload}" >&2
+		exit 2
+		;;
+esac
+
+exit 0
