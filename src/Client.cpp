@@ -46,7 +46,7 @@ Client::~Client()
     {
         _server.close(*_handle);
 
-        Log::infof("%s: Closed client for %s:%hu (%s)", (const char*)Socket::inetNtoA(_address.addr),
+        Log::debugf("%s: Closed client for %s:%hu (%s)", (const char*)Socket::inetNtoA(_address.addr),
             (const char*)Socket::inetNtoA(_destination.addr), _destination.port, (const char*)_destinationHostname);
     }
     delete _proxyLine;
@@ -75,7 +75,7 @@ bool Client::accept(Server::Handle& listener)
             _destinationHostname = Socket::inetNtoA(_destination.addr);
     }
 
-    Log::infof("%s: Accepted client for %s:%hu (%s)", (const char*)Socket::inetNtoA(_address.addr),
+    Log::debugf("%s: Accepted client for %s:%hu (%s)", (const char*)Socket::inetNtoA(_address.addr),
         (const char*)Socket::inetNtoA(_destination.addr), _destination.port, (const char*)_destinationHostname);
 
     if (directConnect)
@@ -134,7 +134,7 @@ void Client::onClosed(DirectLine&)
     delete _directLine;
     _directLine = nullptr;
     if (!_proxyLine)
-        _callback.onClosed(*this);
+        close();
 }
 
 void Client::onOpened(ProxyLine&)
@@ -152,5 +152,13 @@ void Client::onClosed(ProxyLine&)
     delete _proxyLine;
     _proxyLine = nullptr;
     if (!_directLine)
-        _callback.onClosed(*this);
+        close();
+}
+
+void Client::close()
+{
+    if (!_activeLine)
+        Log::infof("%s: Failed to establish connection with %s:%hu", (const char*)Socket::inetNtoA(_address.addr),
+            (const char*)_destinationHostname, _destination.port);
+    _callback.onClosed(*this);
 }

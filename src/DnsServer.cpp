@@ -158,7 +158,7 @@ uint DnsServer::run()
                     isFakeAddr = true;
                 }
 
-                Log::infof("%s: Answered DNS query for %s with %s%s", (const char*)Socket::inetNtoA(sender.addr),
+                Log::debugf("%s: Answered DNS query for %s with %s%s", (const char*)Socket::inetNtoA(sender.addr),
                     (const char*)hostname, (const char*)Socket::inetNtoA(addr), isFakeAddr ? " (surrogate)" : "");
 
                 if (!appendAnswer(responsePos, responseEnd, question, pointerPos - query, addr))

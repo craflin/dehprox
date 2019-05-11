@@ -51,6 +51,8 @@ int main(int argc, char* argv[])
         }
     }
 
+    Log::setLevel(Log::debug);
+
     // load settings
     Settings settings;
     Settings::loadSettings(configFile, settings);

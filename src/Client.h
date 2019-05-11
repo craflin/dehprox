@@ -44,7 +44,7 @@ public: // ProxyLine::ICallback
     virtual void onOpened(ProxyLine&);
     virtual void onClosed(ProxyLine&);
 
-public:
+private:
     Server& _server;
     ICallback& _callback;
     const Settings& _settings;
@@ -55,5 +55,8 @@ public:
     Address _address;
     Address _destination;
     String _destinationHostname;
+
+private:
+    void close();
 };
 
