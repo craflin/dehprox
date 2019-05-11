@@ -67,6 +67,8 @@ int main(int argc, char* argv[])
             Log::errorf("Could not daemonize process: %s", (const char*)Error::getErrorString());
             return -1;
         }
+        Log::setDevice(Log::syslog);
+        Log::setLevel(Log::info);
     }
 #endif
 
