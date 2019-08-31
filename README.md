@@ -24,7 +24,7 @@ Some companies use HTTP proxies. It is sometimes a very time consuming struggle 
 ## Router Setup
 
 * Use a machine (which may be virtual) with two network interfaces.
-* The first of the interfaces has to be connected to the network where you can reach the HTTP proxy.
+* The first interface has to be connected to the network where you can reach the HTTP proxy.
 * The second interface will act as your gateway. Set it up with a somewhat static IPv4 address and it may or may not be in same network.
 * Configure your `iptables` to redirect incoming DNS and TCP traffic from the second interface to the transparent proxy:
 ```
