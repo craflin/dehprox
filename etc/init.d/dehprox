@@ -21,7 +21,8 @@
 PATH=/usr/local/sbin:/usr/local/bin:/sbin:/bin:/usr/sbin:/usr/bin
 DAEMON=/usr/sbin/dehprox
 NAME=dehprox
-DESC="Dehrpox DNS and TCP to HTTP proxy redirector"
+DESC="Dehprox DNS and TCP to HTTP proxy redirector"
+DAEMON_OPTS=
 
 test -x $DAEMON || exit 0
 
@@ -30,12 +31,12 @@ if [ -f /etc/default/dehprox ] ; then
 	. /etc/default/dehprox
 fi
 
-DAEMON_OPTS="$DAEMON_OPTS -b"
+DAEMON_OPTS="-b $DAEMON_OPTS"
 
 start() {
 	echo -n "Starting $DESC: "
 
-	$DAEMON -b
+	$DAEMON $DAEMON_OPTS
 	if [ $? -eq 0 ]; then
 		echo "$NAME."
 	else
