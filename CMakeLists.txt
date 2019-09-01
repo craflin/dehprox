@@ -9,11 +9,12 @@ add_subdirectory(src)
 
 
 set(CPACK_GENERATOR "DEB")
-set(CPACK_PACKAGE_CONTACT "Colin Graf")
+set(CPACK_PACKAGE_CONTACT "Colin Graf <colin.graf@sovereign-labs.com>")
 set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Transparent DNS and TCP to HTTP proxy redirector")
 set(CPACK_PACKAGING_INSTALL_PREFIX "/")
 set(CPACK_DEBIAN_FILE_NAME "DEB-DEFAULT")
+set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/craflin/dehprox")
 
 include(CPack)
 
