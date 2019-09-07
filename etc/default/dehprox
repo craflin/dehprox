@@ -1,0 +1,2 @@
+# Additional options that are passed to the daemon.
+DAEMON_OPTS=

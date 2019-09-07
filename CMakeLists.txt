@@ -15,8 +15,10 @@ set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Transparent DNS and TCP to HTTP proxy red
 set(CPACK_PACKAGING_INSTALL_PREFIX "/")
 set(CPACK_DEBIAN_FILE_NAME "DEB-DEFAULT")
 set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/craflin/dehprox")
+set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.15)")
+set(CPACK_DEBIAN_PACKAGE_SECTION "net")
 
 include(CPack)
 
-install(FILES etc/dehprox.conf DESTINATION etc)
+install(FILES etc/dehprox.conf etc/default/dehprox DESTINATION etc)
 install(PROGRAMS etc/init.d/dehprox DESTINATION etc/init.d)
