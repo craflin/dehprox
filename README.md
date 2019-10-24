@@ -26,10 +26,10 @@ Some companies use HTTP proxies. It is sometimes a very time consuming struggle 
 * Use a machine (which may be virtual) with two network interfaces.
 * The first interface has to be connected to the network where you can reach the HTTP proxy.
 * The second interface will act as your gateway. Set it up with a somewhat static IPv4 address and it may or may not be in same network.
-* Configure your `iptables` to redirect incoming DNS and TCP traffic from the second interface to the transparent proxy:
+* Configure your `iptables` to redirect incoming DNS and TCP traffic from the second interface (except TCP traffic directly directed to your router) to the transparent proxy:
 ```
 iptables -t nat -A PREROUTING -i <second_interface> -p udp --dport 53 -j DNAT --to <ip_of_second_interface>:62124
-iptables -t nat -A PREROUTING -i <second_interface> -p tcp -j DNAT --to <ip_of_second_interface>:62124
+iptables -t nat -A PREROUTING -i <second_interface> -p tcp ! -d <ip_of_second_interface> -j DNAT --to <ip_of_second_interface>:62124
 ```
 * Start the `dehprox` server.
 * Configure your clients to be in the same network as the second interface and to use the IP address of the second interface as gateway and DNS server.
