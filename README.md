@@ -3,7 +3,7 @@
 
 Dehprox is a transparent DNS and TCP to HTTP proxy redirector (for Linux). It is designed to run in environments guarded with a heavy restricted HTTP proxy, where it is not possible to resolve DNS queries using a DNS to TCP or HTTP tunnel. DNS queries are answered with surrogate addresses that are mapped back to the hostname when the transparent proxy tries to establish a connection using the HTTP proxy.
 
-If your network is not that restricted, you should probably look at other TCP to proxy server redirector like [redsocks2](https://github.com/semigodking/redsocks).
+If your network is not that restricted, you should probably look at other TCP to proxy server redirectors like [redsocks2](https://github.com/semigodking/redsocks).
 
 ## Features
 
