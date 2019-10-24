@@ -19,7 +19,7 @@ It is sometimes a very time consuming struggle to configure your system (or syst
 
 * Clone the repository and initialize submodules.
 * Build the project with `cmake`.
-* You can build a deb package using the target `package` in CMake.
+* You can build a `deb` package using the target `package` in CMake.
 
 ## Router Setup
 
