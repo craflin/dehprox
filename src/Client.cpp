@@ -75,6 +75,13 @@ bool Client::accept(Server::Handle& listener)
             _destinationHostname = Socket::inetNtoA(_destination.addr);
     }
 
+    if (!directConnect && !proxyConnect)
+    {
+        Log::debugf("%s: Rejected client for %s:%hu (Unknown surrogate address)", (const char*)Socket::inetNtoA(_address.addr),
+            (const char*)Socket::inetNtoA(_destination.addr), _destination.port);
+        return false;
+    }
+
     Log::debugf("%s: Accepted client for %s:%hu (%s)", (const char*)Socket::inetNtoA(_address.addr),
         (const char*)Socket::inetNtoA(_destination.addr), _destination.port, (const char*)_destinationHostname);
 
