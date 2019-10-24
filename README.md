@@ -13,7 +13,7 @@ If your network is not that restricted, you should probably look at other TCP to
 
 ## Motivation
 
-Some companies use HTTP proxies. It is sometimes a very time consuming struggle to configure your system (or systems) and your tools (that may ignore your system settings) to use them and some tools might not support proxy servers at all. Hence, it is potentially easier to set up a little router that allows you to use your network like an ordinary network with gateway and DNS server.
+It is sometimes a very time consuming struggle to configure your system (or systems) and your tools (that may ignore your system settings) to use a HTTP proxy and some tools might not support proxy servers at all. Hence, it is potentially easier to set up a little router that allows you to use your network like an ordinary network with gateway and DNS server.
 
 ## Build Instructions
 
