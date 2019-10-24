@@ -1,6 +1,8 @@
 
 #include "ProxyServer.h"
 
+#include <nstd/Error.h>
+
 ProxyServer::ProxyServer(const Settings& settings) : _settings(settings)
 {
     _server.setReuseAddress(true);
@@ -21,7 +23,7 @@ uint ProxyServer::run()
         switch(event.type)
         {
         case Server::Event::failType:
-            ((Connection::ICallback*)event.userData)->onAbolished();
+            ((Connection::ICallback*)event.userData)->onAbolished(Error::getLastError());
             break;
         case Server::Event::openType:
             ((Connection::ICallback*)event.userData)->onOpened();

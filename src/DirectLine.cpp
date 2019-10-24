@@ -1,6 +1,8 @@
 
 #include "DirectLine.h"
 
+#include <nstd/Error.h>
+
 DirectLine::DirectLine(Server& server, Server::Handle& client, ICallback& callback)
     : _server(server)
     , _client(client)
@@ -49,10 +51,10 @@ void DirectLine::onWrite()
 
 void DirectLine::onClosed()
 {
-    _callback.onClosed(*this);
+    _callback.onClosed(*this, "Closed by peer");
 }
 
-void DirectLine::onAbolished()
+void DirectLine::onAbolished(uint error)
 {
-    _callback.onClosed(*this);
+    _callback.onClosed(*this, Error::getErrorString(error));
 }

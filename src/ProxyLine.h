@@ -15,7 +15,7 @@ public:
     {
     public:
         virtual void onOpened(ProxyLine&) = 0;
-        virtual void onClosed(ProxyLine&) = 0;
+        virtual void onClosed(ProxyLine&, const String& error) = 0;
 
     protected:
         ICallback() {}
@@ -35,7 +35,7 @@ public: // Connection::ICallback
     virtual void onRead();
     virtual void onWrite();
     virtual void onClosed();
-    virtual void onAbolished();
+    virtual void onAbolished(uint error);
 
 private:
     Server& _server;

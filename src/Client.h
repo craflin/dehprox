@@ -34,15 +34,15 @@ public: // Connection::ICallback
     virtual void onRead();
     virtual void onWrite();
     virtual void onClosed();
-    virtual void onAbolished() {}
+    virtual void onAbolished(uint) {}
 
 public: // DirectLine::ICallback
     virtual void onOpened(DirectLine&);
-    virtual void onClosed(DirectLine&);
+    virtual void onClosed(DirectLine&, const String& error);
 
 public: // ProxyLine::ICallback
     virtual void onOpened(ProxyLine&);
-    virtual void onClosed(ProxyLine&);
+    virtual void onClosed(ProxyLine&, const String& error);
 
 private:
     Server& _server;
@@ -57,6 +57,6 @@ private:
     String _destinationHostname;
 
 private:
-    void close();
+    void close(const String& error);
 };
 

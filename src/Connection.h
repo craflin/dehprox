@@ -13,7 +13,7 @@ public:
         virtual void onRead() = 0;
         virtual void onWrite() = 0;
         virtual void onClosed() = 0;
-        virtual void onAbolished() = 0;
+        virtual void onAbolished(uint error) = 0;
 
     protected:
         ICallback() {}

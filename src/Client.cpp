@@ -136,12 +136,12 @@ void Client::onOpened(DirectLine&)
     _server.resume(*_handle);
 }
 
-void Client::onClosed(DirectLine&)
+void Client::onClosed(DirectLine&, const String& error)
 {
     delete _directLine;
     _directLine = nullptr;
     if (!_proxyLine)
-        close();
+        close(error);
 }
 
 void Client::onOpened(ProxyLine&)
@@ -154,18 +154,18 @@ void Client::onOpened(ProxyLine&)
     _server.resume(*_handle);
 }
 
-void Client::onClosed(ProxyLine&)
+void Client::onClosed(ProxyLine&, const String& error)
 {
     delete _proxyLine;
     _proxyLine = nullptr;
     if (!_directLine)
-        close();
+        close(error);
 }
 
-void Client::close()
+void Client::close(const String& error)
 {
     if (!_activeLine)
-        Log::infof("%s: Failed to establish connection with %s:%hu", (const char*)Socket::inetNtoA(_address.addr),
-            (const char*)_destinationHostname, _destination.port);
+        Log::infof("%s: Failed to establish connection with %s:%hu (%s)", (const char*)Socket::inetNtoA(_address.addr),
+            (const char*)_destinationHostname, _destination.port, (const char*)error);
     _callback.onClosed(*this);
 }

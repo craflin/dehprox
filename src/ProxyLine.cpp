@@ -1,6 +1,8 @@
 
 #include "ProxyLine.h"
 
+#include <nstd/Error.h>
+
 ProxyLine::ProxyLine(Server& server, Server::Handle& client, ICallback& callback, const Settings& settings)
     : _server(server)
     , _client(client)
@@ -69,10 +71,10 @@ void ProxyLine::onRead()
                 _callback.onOpened(*this);
             }
             else
-                _callback.onClosed(*this);
+                _callback.onClosed(*this, _proxyResponse.substr(0, headerEnd - (const char*)_proxyResponse));
         }
         else if(_proxyResponse.length() > 128)
-            _callback.onClosed(*this);
+            _callback.onClosed(*this, "Invalid HTTP reponse");
     }
 }
 
@@ -84,10 +86,10 @@ void ProxyLine::onWrite()
 
 void ProxyLine::onClosed()
 {
-    _callback.onClosed(*this);
+    _callback.onClosed(*this, "Closed by proxy server");
 }
 
-void ProxyLine::onAbolished()
+void ProxyLine::onAbolished(uint error)
 {
-    _callback.onClosed(*this);
+    _callback.onClosed(*this, Error::getErrorString(error));
 }
