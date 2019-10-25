@@ -77,6 +77,8 @@ bool Client::accept(Server::Handle& listener)
 
     if (!directConnect && !proxyConnect)
     {
+        _server.close(*_handle);
+        _handle = nullptr;
         Log::debugf("%s: Rejected client for %s:%hu (Unknown surrogate address)", (const char*)Socket::inetNtoA(_address.addr),
             (const char*)Socket::inetNtoA(_destination.addr), _destination.port);
         return false;
@@ -165,7 +167,7 @@ void Client::onClosed(ProxyLine&, const String& error)
 void Client::close(const String& error)
 {
     if (!_activeLine)
-        Log::infof("%s: Failed to establish connection with %s:%hu (%s)", (const char*)Socket::inetNtoA(_address.addr),
+        Log::infof("%s: Failed to establish connection with %s:%hu: %s", (const char*)Socket::inetNtoA(_address.addr),
             (const char*)_destinationHostname, _destination.port, (const char*)error);
     _callback.onClosed(*this);
 }

@@ -71,9 +71,12 @@ void ProxyLine::onRead()
                 _callback.onOpened(*this);
             }
             else
-                _callback.onClosed(*this, _proxyResponse.substr(0, headerEnd - (const char*)_proxyResponse));
+            {
+                const char* firstLineEnd = _proxyResponse.find("\r\n");
+                _callback.onClosed(*this, _proxyResponse.substr(0, firstLineEnd - (const char*)_proxyResponse));
+            }
         }
-        else if(_proxyResponse.length() > 128)
+        else if(_proxyResponse.length() > 256)
             _callback.onClosed(*this, "Invalid HTTP reponse");
     }
 }
