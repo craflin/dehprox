@@ -143,6 +143,7 @@ uint DnsServer::run()
             usize querySize = end - query;
             const byte* responsePos = response + querySize;
             pos = (const byte*)(queryHeader + 1);
+            uint16 answerCount = 0;
             for (uint16 i = 0; i < questionCount; ++i)
             {
                 const byte* pointerPos = pos;
@@ -154,6 +155,11 @@ uint DnsServer::run()
                 bool isFakeAddr = false;
                 if (!DnsDatabase::resolve(hostname, addr))
                 {
+                    if (!hostname.find('.'))
+                    {
+                        Log::debugf("%s: Ignored DNS query for %s", (const char*)Socket::inetNtoA(sender.addr), (const char*)hostname);
+                        continue;
+                    }
                     addr = DnsDatabase::resolveFake(hostname);
                     isFakeAddr = true;
                 }
@@ -163,11 +169,12 @@ uint DnsServer::run()
 
                 if (!appendAnswer(responsePos, responseEnd, question, pointerPos - query, addr))
                     goto ignoreRequest;
+                ++answerCount;
             }
             // create response header
             memcpy(responseHeader, query, querySize);
             responseHeader->flags = htons(flags | DNS_QR_BIT | DNS_RA_BIT);
-            responseHeader->answerCount = responseHeader->questionCount;
+            responseHeader->answerCount = htons(answerCount);
             responseHeader->nameServerRecordCount = 0;
             responseHeader->additionalRecordCount = 0;
 
