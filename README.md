@@ -10,6 +10,7 @@ If your network is not that restricted, you should probably look at other TCP to
 * TCP traffic (including HTTPS) to HTTP proxy server redirection
 * DNS resolution and resolution faking
 * Automatic detection of a faster route without the HTTP proxy
+* White and black listing of destination addresses
 
 ## Motivation
 

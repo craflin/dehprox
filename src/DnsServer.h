@@ -1,20 +1,20 @@
 
 #pragma once
 
-#include "Address.h"
+#include "Settings.h"
 
 #include <nstd/Socket/Socket.h>
 
 class DnsServer
 {
 public:
-    DnsServer(const Address& address) : _address(address) {}
+    DnsServer(const Settings& settings) : _settings(settings) {}
 
     bool start();
 
     uint run();
 
 private:
-    const Address& _address;
+    const Settings& _settings;
     Socket _socket;
 };

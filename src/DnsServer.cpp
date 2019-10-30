@@ -109,7 +109,7 @@ bool DnsServer::start()
 {
     if (!_socket.open(Socket::udpProtocol) ||
         !_socket.setReuseAddress() ||
-        !_socket.bind(_address.addr, _address.port))
+        !_socket.bind(_settings.dnsListenAddr.addr, _settings.dnsListenAddr.port))
         return false;
     return true;
 }
@@ -150,6 +150,18 @@ uint DnsServer::run()
                 DnsQuestion question;
                 if (!parseQuestion(pos, end, hostname, question))
                     goto ignoreRequest;
+
+                const char* rejectReason = nullptr;
+                if (!_settings.whiteList.isEmpty() && !Settings::isInList(hostname, _settings.whiteList))
+                    rejectReason = "Not listed in white list";
+                else if (Settings::isInList(hostname, _settings.blackList))
+                    rejectReason = "Listed in black list";
+
+                if (rejectReason)
+                {
+                    Log::infof("%s: Ignored DNS query for %s: %s", (const char*)Socket::inetNtoA(sender.addr), (const char*)hostname, rejectReason);
+                    continue; // don't try to resolve black listed hostnames to keep them out of the DnsDatabase
+                }
 
                 uint32 addr;
                 bool isFakeAddr = false;

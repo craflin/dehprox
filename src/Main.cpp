@@ -73,7 +73,7 @@ int main(int argc, char* argv[])
 #endif
 
     // start dns server
-    DnsServer dnsServer(settings.dnsListenAddr);
+    DnsServer dnsServer(settings);
     if (settings.dnsListenAddr.port)
     {
         if (!dnsServer.start())

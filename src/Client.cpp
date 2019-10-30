@@ -65,22 +65,37 @@ bool Client::accept(Server::Handle& listener)
 
     bool directConnect = false;
     bool proxyConnect = false;
+    const char* rejectReason = nullptr;
     if (DnsDatabase::reverseResolveFake(_destination.addr, _destinationHostname))
         proxyConnect = true;
-    else if (!DnsDatabase::isFake(_destination.addr))
+    else if (DnsDatabase::reverseResolve(_destination.addr, _destinationHostname))
     {
         directConnect = _settings.autoProxySkip;
         proxyConnect = true;
-        if (!DnsDatabase::reverseResolve(_destination.addr, _destinationHostname))
-            _destinationHostname = Socket::inetNtoA(_destination.addr);
+    }
+    else if (!DnsDatabase::isFake(_destination.addr))
+    {
+        _destinationHostname = Socket::inetNtoA(_destination.addr);
+        directConnect = _settings.autoProxySkip;
+        proxyConnect = true;
+    }
+    else
+        rejectReason = "Unknown surrogate address";
+
+    if (!rejectReason)
+    {
+        if (!_settings.whiteList.isEmpty() && !Settings::isInList(_destinationHostname, _settings.whiteList))
+            rejectReason = "Not listed in white list";
+        else if (Settings::isInList(_destinationHostname, _settings.blackList))
+            rejectReason = "Listed in black list";
     }
 
-    if (!directConnect && !proxyConnect)
+    if (rejectReason)
     {
         _server.close(*_handle);
         _handle = nullptr;
-        Log::debugf("%s: Rejected client for %s:%hu (Unknown surrogate address)", (const char*)Socket::inetNtoA(_address.addr),
-            (const char*)Socket::inetNtoA(_destination.addr), _destination.port);
+        Log::infof("%s: Rejected client for %s:%hu (%s): %s", (const char*)Socket::inetNtoA(_address.addr),
+            (const char*)Socket::inetNtoA(_destination.addr), _destination.port, (const char*)_destinationHostname, rejectReason);
         return false;
     }
 

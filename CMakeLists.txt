@@ -20,5 +20,6 @@ set(CPACK_DEBIAN_PACKAGE_SECTION "net")
 
 include(CPack)
 
-install(FILES etc/dehprox.conf etc/default/dehprox DESTINATION etc)
+install(FILES etc/dehprox.conf DESTINATION etc)
+install(FILES etc/default/dehprox DESTINATION etc/default)
 install(PROGRAMS etc/init.d/dehprox DESTINATION etc/init.d)

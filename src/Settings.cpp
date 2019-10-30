@@ -43,8 +43,30 @@ void Settings::loadSettings(const String& file, Settings& settings)
             settings.dnsListenAddr.addr = Socket::inetAddr(value, &settings.dnsListenAddr.port);
         else if (option == "autoProxySkip")
             settings.autoProxySkip = value.toBool();
+        else if (option == "allowDest")
+            settings.whiteList.append(value);
+        else if (option == "denyDest")
+            settings.blackList.append(value);
         else
             Log::warningf("Unknown option: %s", (const char*)option);
     }
 }
 
+bool Settings::isInList(const String& hostname_, const HashSet<String>& list)
+{
+    if (list.contains(hostname_))
+        return true;
+    const char* x = hostname_.find('.');
+    if (!x)
+        return false;
+    String hostname = hostname_.substr(x - (const char*)hostname_ + 1);
+    for (;;)
+    {
+        if (list.contains(hostname))
+            return true;
+        const char* x = hostname.find('.');
+        if (!x)
+            return false;
+        hostname = hostname.substr(x - (const char*)hostname + 1);
+    }
+}
