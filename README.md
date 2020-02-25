@@ -34,6 +34,8 @@ iptables -t nat -A PREROUTING -i <second_interface> -p tcp ! -d <ip_of_second_in
 ```
 * Start the `dehprox` server.
 * Configure your clients to be in the same network as the second interface and to use the IP address of the second interface as gateway and DNS server.
+* If there is no DHCP server in the network of the second interface, you can configure a DHCP server to run on the second interface to auto-configure your clients.
+* You can configure your router to do IP forwarding and to not route some IP ranges to dehprox to skip the proxy for these IP ranges.
 
 (It might be possible to set up the proxy in different ways (like using it locally without a second machine), but I have not yet tried anything else.)
 
