@@ -32,7 +32,7 @@ Sometimes it is very time consuming to configure your system (or systems) and yo
 iptables -t nat -A PREROUTING -i <second_interface> -p udp --dport 53 -j DNAT --to <ip_of_second_interface>:62124
 iptables -t nat -A PREROUTING -i <second_interface> -p tcp ! -d <ip_of_second_interface> -j DNAT --to <ip_of_second_interface>:62124
 ```
-* Start the `dehprox` server.
+* Install `dehprox`, configure the HTTP proxy in `/etc/dehprox.conf` (if necessary) and start the `dehprox` server.
 * Configure your clients to be in the same network as the second interface and to use the IP address of the second interface as gateway and DNS server.
 * If there is no DHCP server in the network of the second interface, you can configure a DHCP server to run on the second interface to auto-configure your clients.
 * You can configure your router to do IP forwarding and to not route some IP ranges to dehprox to skip the proxy for these IP ranges.
