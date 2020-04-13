@@ -1,5 +1,5 @@
 
-#include "Client.h"
+#include "Client.hpp"
 
 #ifndef _WIN32
 #include <arpa/inet.h>
@@ -9,9 +9,9 @@
 #include <nstd/Socket/Socket.hpp>
 #include <nstd/Log.hpp>
 
-#include "DnsDatabase.h"
-#include "DirectLine.h"
-#include "ProxyLine.h"
+#include "DnsDatabase.hpp"
+#include "DirectLine.hpp"
+#include "ProxyLine.hpp"
 
 bool getOriginalDst(Socket& s, uint32& addr, uint16& port)
 {

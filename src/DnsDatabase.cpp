@@ -1,5 +1,5 @@
 
-#include "DnsDatabase.h"
+#include "DnsDatabase.hpp"
 
 #include <nstd/Socket/Socket.hpp>
 #include <nstd/Mutex.hpp>

@@ -5,8 +5,8 @@
 #include <nstd/Console.hpp>
 #include <nstd/Error.hpp>
 
-#include "ProxyServer.h"
-#include "DnsServer.h"
+#include "ProxyServer.hpp"
+#include "DnsServer.hpp"
 
 int main(int argc, char* argv[])
 {

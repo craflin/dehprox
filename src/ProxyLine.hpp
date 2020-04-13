@@ -3,8 +3,8 @@
 
 #include <nstd/String.hpp>
 
-#include "Connection.h"
-#include "Settings.h"
+#include "Connection.hpp"
+#include "Settings.hpp"
 
 class Server;
 

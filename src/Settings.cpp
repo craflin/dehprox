@@ -1,5 +1,5 @@
 
-#include "Settings.h"
+#include "Settings.hpp"
 
 #include <nstd/File.hpp>
 #include <nstd/List.hpp>

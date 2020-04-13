@@ -3,10 +3,10 @@
 
 #include <nstd/Socket/Server.hpp>
 
-#include "Connection.h"
-#include "DirectLine.h"
-#include "ProxyLine.h"
-#include "Settings.h"
+#include "Connection.hpp"
+#include "DirectLine.hpp"
+#include "ProxyLine.hpp"
+#include "Settings.hpp"
 
 class Client : public Connection::ICallback
              , public DirectLine::ICallback

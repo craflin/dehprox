@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include "Settings.h"
+#include "Settings.hpp"
 
 #include <nstd/Socket/Socket.hpp>
 

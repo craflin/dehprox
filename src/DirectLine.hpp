@@ -1,8 +1,8 @@
 
 #pragma once
 
-#include "Connection.h"
-#include "Address.h"
+#include "Connection.hpp"
+#include "Address.hpp"
 
 class Server;
 

@@ -1,5 +1,5 @@
 
-#include "DnsServer.h"
+#include "DnsServer.hpp"
 
 #ifdef _WIN32
 #include <WinSock2.h>
@@ -11,7 +11,7 @@
 
 #include <nstd/Log.hpp>
 
-#include "DnsDatabase.h"
+#include "DnsDatabase.hpp"
 
 namespace {
 

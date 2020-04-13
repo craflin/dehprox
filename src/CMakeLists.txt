@@ -1,22 +1,22 @@
 
 set(sources
-    Address.h
+    Address.hpp
     Client.cpp
-    Client.h
-    Connection.h
+    Client.hpp
+    Connection.hpp
     DirectLine.cpp
-    DirectLine.h
+    DirectLine.hpp
     DnsDatabase.cpp
-    DnsDatabase.h
+    DnsDatabase.hpp
     DnsServer.cpp
-    DnsServer.h
+    DnsServer.hpp
     Main.cpp
     ProxyLine.cpp
-    ProxyLine.h
+    ProxyLine.hpp
     ProxyServer.cpp
-    ProxyServer.h
+    ProxyServer.hpp
     Settings.cpp
-    Settings.h
+    Settings.hpp
 )
 
 add_executable(dehprox

@@ -3,9 +3,9 @@
 
 #include <nstd/Socket/Server.hpp>
 
-#include "Client.h"
-#include "Address.h"
-#include "Settings.h"
+#include "Client.hpp"
+#include "Address.hpp"
+#include "Settings.hpp"
 
 class ProxyServer : public Client::ICallback
 {
