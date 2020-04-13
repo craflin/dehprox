@@ -1,9 +1,9 @@
 
 #include "Settings.h"
 
-#include <nstd/File.h>
-#include <nstd/List.h>
-#include <nstd/Log.h>
+#include <nstd/File.hpp>
+#include <nstd/List.hpp>
+#include <nstd/Log.hpp>
 
 Settings::Settings() : autoProxySkip(true)
 {

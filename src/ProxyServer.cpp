@@ -1,7 +1,7 @@
 
 #include "ProxyServer.h"
 
-#include <nstd/Error.h>
+#include <nstd/Error.hpp>
 
 ProxyServer::ProxyServer(const Settings& settings) : _settings(settings)
 {

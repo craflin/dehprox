@@ -1,8 +1,7 @@
 
 #pragma once
 
-#include <nstd/Base.h>
-#include <nstd/Socket/Socket.h>
+#include <nstd/Socket/Socket.hpp>
 
 struct Address
 {

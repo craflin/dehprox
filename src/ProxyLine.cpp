@@ -1,7 +1,7 @@
 
 #include "ProxyLine.h"
 
-#include <nstd/Error.h>
+#include <nstd/Error.hpp>
 
 ProxyLine::ProxyLine(Server& server, Server::Handle& client, ICallback& callback, const Settings& settings)
     : _server(server)

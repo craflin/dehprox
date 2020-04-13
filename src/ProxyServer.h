@@ -1,7 +1,7 @@
 
 #pragma once
 
-#include <nstd/Socket/Server.h>
+#include <nstd/Socket/Server.hpp>
 
 #include "Client.h"
 #include "Address.h"

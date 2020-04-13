@@ -6,8 +6,8 @@
 #include <linux/netfilter_ipv4.h>
 #endif
 
-#include <nstd/Socket/Socket.h>
-#include <nstd/Log.h>
+#include <nstd/Socket/Socket.hpp>
+#include <nstd/Log.hpp>
 
 #include "DnsDatabase.h"
 #include "DirectLine.h"

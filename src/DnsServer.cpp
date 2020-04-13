@@ -9,7 +9,7 @@
 
 #include <cstring>
 
-#include <nstd/Log.h>
+#include <nstd/Log.hpp>
 
 #include "DnsDatabase.h"
 

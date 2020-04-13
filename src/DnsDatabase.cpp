@@ -1,10 +1,10 @@
 
 #include "DnsDatabase.h"
 
-#include <nstd/Socket/Socket.h>
-#include <nstd/Mutex.h>
-#include <nstd/HashMap.h>
-#include <nstd/Time.h>
+#include <nstd/Socket/Socket.hpp>
+#include <nstd/Mutex.hpp>
+#include <nstd/HashMap.hpp>
+#include <nstd/Time.hpp>
 
 #define FAKE_ADDR_SUBNET 0x64400000 // "Shared Address Space for Service Providers"
 #define FAKE_ADDR_SUBNET_MASK (~(0xffffffff >> 10))

@@ -1,9 +1,9 @@
 
-#include <nstd/Log.h>
-#include <nstd/Thread.h>
-#include <nstd/Process.h>
-#include <nstd/Console.h>
-#include <nstd/Error.h>
+#include <nstd/Log.hpp>
+#include <nstd/Thread.hpp>
+#include <nstd/Process.hpp>
+#include <nstd/Console.hpp>
+#include <nstd/Error.hpp>
 
 #include "ProxyServer.h"
 #include "DnsServer.h"

@@ -24,9 +24,11 @@ add_executable(dehprox
 )
 
 target_link_libraries(dehprox PRIVATE
-    libnstd
+    libnstd::Core libnstd::Socket
 )
 
 source_group("" FILES ${sources})
+
+set_property(TARGET dehprox PROPERTY FOLDER "src")
 
 install(TARGETS dehprox DESTINATION usr/sbin)

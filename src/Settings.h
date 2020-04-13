@@ -1,8 +1,8 @@
 
 #pragma once
 
-#include <nstd/String.h>
-#include <nstd/HashSet.h>
+#include <nstd/String.hpp>
+#include <nstd/HashSet.hpp>
 
 #include "Address.h"
 

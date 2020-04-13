@@ -1,7 +1,7 @@
 
 #include "DirectLine.h"
 
-#include <nstd/Error.h>
+#include <nstd/Error.hpp>
 
 DirectLine::DirectLine(Server& server, Server::Handle& client, ICallback& callback)
     : _server(server)
