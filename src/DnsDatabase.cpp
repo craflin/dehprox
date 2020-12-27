@@ -109,7 +109,8 @@ uint32 DnsDatabase::resolveFake(const String& hostname)
                     i = 0;
                 }
                 fakeAddr *= 16807;
-                fakeAddr ^= ((const char*)hostname)[i % hostname.length()];
+                if (!hostname.isEmpty())
+                    fakeAddr ^= ((const char*)hostname)[i % hostname.length()];
                 fakeAddr = (fakeAddr & ~FAKE_ADDR_SUBNET_MASK) | FAKE_ADDR_SUBNET;
                 if ((fakeAddr & 0xff) == 0xff || (fakeAddr & 0xff00) == 0xff00 || (fakeAddr & 0xff0000) == 0xff0000)
                     continue;
