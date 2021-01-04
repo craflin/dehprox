@@ -1,3 +1,5 @@
+add_subdirectory(TestProxy)
+return()
 
 set(sources
     Address.hpp
@@ -32,3 +34,6 @@ source_group("" FILES ${sources})
 set_property(TARGET dehprox PROPERTY FOLDER "src")
 
 install(TARGETS dehprox DESTINATION usr/sbin)
+
+add_subdirectory(TestProxy)
+
