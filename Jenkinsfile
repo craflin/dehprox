@@ -9,7 +9,7 @@ pipeline {
                 axes {
                     axis {
                         name 'platform'
-                        values 'ubuntu20.04-x86_64', 'ubuntu18.04-x86_64', 'raspbian10-armv7l'
+                        values 'ubuntu20.04-x86_64', 'ubuntu18.04-x86_64', 'raspbian10-armv7l', 'centos8-x86_64'
                     }
                 }
                 stages {
@@ -22,7 +22,7 @@ pipeline {
                 }
                 post { 
                     always {
-                        archiveArtifacts artifacts: 'build/dehprox-*.deb'
+                        archiveArtifacts artifacts: 'build/dehprox-*.deb,build/dehprox-*.rpm'
                     }
                 } 
             }
