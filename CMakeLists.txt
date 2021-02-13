@@ -29,6 +29,7 @@ endif()
 if(CDEPLOY_OS MATCHES "centos.*")
     set(CPACK_GENERATOR "RPM")
     set(CPACK_RPM_PACKAGE_LICENSE "Apache License")
+    set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "/usr/sbin")
 endif()
 
 
