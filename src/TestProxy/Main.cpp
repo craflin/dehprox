@@ -75,17 +75,21 @@ Client::Uplink::~Uplink()
 
 namespace {
 
-String parseNextWord(const char*& str)
+bool parseNextWord(const char*& str, String& word)
 {
   while(String::isSpace(*str))
     ++str;
   const char* end = String::findOneOf(str, " \r\t\n");
   if (!end)
-    return String();
-  String result(str, end - str);
-  str = end + 1;
-  return result;
+    return false;
+  word.attach(str, end - str);
+  return true;
 }
+
+//bool parseSkipLine(const char*& str)
+//{
+//  ??
+//}
 
 }
 
@@ -113,8 +117,10 @@ String parseNextWord(const char*& str)
         if (headerEnd)
         {
           const char* i = headerStart;
-          String method = parseNextWord(i);
-          String target = parseNextWord(i);
+          String method;
+          String target;
+          parseNextWord(i, method);
+          parseNextWord(i, target);
           if (method == "CONNECT")
           {
             uint16 port = 80;
@@ -129,23 +135,29 @@ String parseNextWord(const char*& str)
             _receiveBuffer.removeFront(headerEnd + 4 - headerStart);
             _client.suspend();
           }
-          //else
-          //{
-          //  // todo: support "GET", "POST", etc
-          //  const char* lineEnd = String::find(headerStart, "\r\n") + 2;
-          //  String line;
-          //  while(parseNextLine(lineEnd, line))
-          //  {
-          //    if (!parseNextHeaderField(line))
-          //  }
-          //  ??
-          //}
           else
           {
-            String request(headerStart, headerEnd - headerStart);
-            Console::printf("Ignored request: %s\n", (const char*)request);
-            _callback.onClosed(*this);
+            // todo: support "GET", "POST", etc
+            String headerField;
+            String host;
+            while(parseSkipLine(i))
+            {
+              if (!parseNextWord(i, headerField))
+                break;
+              if (headerField == "Host:")
+              {
+                parseNextWord(i, host);
+
+              }
+            } 
+            ??
           }
+          //else
+          //{
+          //  String request(headerStart, headerEnd - headerStart);
+          //  Console::printf("Ignored request: %s\n", (const char*)request);
+          //  _callback.onClosed(*this);
+          //}
         }
         else if(_receiveBuffer.size() > 1024)
             _callback.onClosed(*this);
