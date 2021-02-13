@@ -12,15 +12,25 @@ include(CDeploy)
 add_subdirectory(3rdparty)
 add_subdirectory(src)
 
-set(CPACK_GENERATOR "DEB")
 set(CPACK_PACKAGE_CONTACT "Colin Graf <colin.graf@sovereign-labs.com>")
 set(CPACK_PACKAGE_VERSION "${PROJECT_VERSION}")
 set(CPACK_PACKAGE_DESCRIPTION_SUMMARY "Transparent DNS and TCP to HTTP proxy redirector")
+set(CMAKE_PROJECT_HOMEPAGE_URL "https://github.com/craflin/dehprox")
 set(CPACK_PACKAGING_INSTALL_PREFIX "/")
-#set(CPACK_DEBIAN_FILE_NAME "DEB-DEFAULT")
-set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "https://github.com/craflin/dehprox")
-set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.15)")
-set(CPACK_DEBIAN_PACKAGE_SECTION "net")
+
+if(CDEPLOY_OS MATCHES "ubuntu.*" OR CDEPLOY_OS MATCHES "raspbian.*")
+    set(CPACK_GENERATOR "DEB")
+    #set(CPACK_DEBIAN_FILE_NAME "DEB-DEFAULT")
+    set(CPACK_DEBIAN_PACKAGE_HOMEPAGE "${CMAKE_PROJECT_HOMEPAGE_URL}")
+    set(CPACK_DEBIAN_PACKAGE_DEPENDS "libc6 (>= 2.15)")
+    set(CPACK_DEBIAN_PACKAGE_SECTION "net")
+endif()
+
+if(CDEPLOY_OS MATCHES "centos.*")
+    set(CPACK_GENERATOR "RPM")
+    set(CPACK_RPM_PACKAGE_LICENSE "Apache License")
+endif()
+
 
 include(CPack)
 

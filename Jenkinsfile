@@ -22,7 +22,7 @@ pipeline {
                 }
                 post { 
                     always {
-                        archiveArtifacts artifacts: 'build/dehprox-*.deb'
+                        archiveArtifacts artifacts: 'build/dehprox-*.deb,build/dehprox-*.rpm'
                     }
                 } 
             }
