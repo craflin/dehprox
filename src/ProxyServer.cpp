@@ -19,8 +19,8 @@ bool ProxyServer::start()
 
 uint ProxyServer::run()
 {
-    for(Server::Event event; _server.poll(event);)
-        switch(event.type)
+    for (Server::Event event; _server.poll(event);)
+        switch (event.type)
         {
         case Server::Event::failType:
             ((Connection::ICallback*)event.userData)->onAbolished(Error::getLastError());

@@ -7,7 +7,7 @@ class Connection
 {
 public:
     class ICallback
-    {;
+    {
     public:
         virtual void onOpened() = 0;
         virtual void onRead() = 0;

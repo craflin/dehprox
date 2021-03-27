@@ -26,7 +26,7 @@ public:
 
     bool connect(const Address& address);
 
-    Server::Handle* getHandle() const {return _handle;}
+    Server::Handle* getHandle() const { return _handle; }
 
 public: // Connection::ICallback
     virtual void onOpened();

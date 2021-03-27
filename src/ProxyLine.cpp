@@ -76,7 +76,7 @@ void ProxyLine::onRead()
                 _callback.onClosed(*this, _proxyResponse.substr(0, firstLineEnd - (const char*)_proxyResponse));
             }
         }
-        else if(_proxyResponse.length() > 256)
+        else if (_proxyResponse.length() > 256)
             _callback.onClosed(*this, "Invalid HTTP reponse");
     }
 }
