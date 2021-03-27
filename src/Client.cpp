@@ -183,6 +183,6 @@ void Client::close(const String& error)
 {
     if (!_activeLine)
         Log::infof("%s: Failed to establish connection with %s:%hu: %s", (const char*)Socket::inetNtoA(_address.addr),
-            (const char*)_destinationHostname, _destination.port, (const char*)error);
+        (const char*)_destinationHostname, _destination.port, (const char*)error);
     _callback.onClosed(*this);
 }

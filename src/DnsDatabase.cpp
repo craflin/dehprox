@@ -11,37 +11,37 @@
 
 namespace {
 
-struct AddrInfo
-{
-    uint32 addr;
-    int64 timestamp;
-};
-
-Mutex _mutex;
-HashMap<String, AddrInfo> _nameToAddr(2000);
-HashMap<uint32, String> _addrToName(2000);
-
-void _cleanupAddresses()
-{
-    int64 now = Time::time();
-    while (!_nameToAddr.isEmpty())
+    struct AddrInfo
     {
-        const AddrInfo& addrInfo = *_nameToAddr.begin();
-        if (now - addrInfo.timestamp > 15 * 60 * 1000) // 15 minutes
+        uint32 addr;
+        int64 timestamp;
+    };
+
+    Mutex _mutex;
+    HashMap<String, AddrInfo> _nameToAddr(2000);
+    HashMap<uint32, String> _addrToName(2000);
+
+    void _cleanupAddresses()
+    {
+        int64 now = Time::time();
+        while (!_nameToAddr.isEmpty())
         {
-            _addrToName.remove(addrInfo.addr);
-            _nameToAddr.removeFront();
+            const AddrInfo& addrInfo = *_nameToAddr.begin();
+            if (now - addrInfo.timestamp > 15 * 60 * 1000) // 15 minutes
+            {
+                _addrToName.remove(addrInfo.addr);
+                _nameToAddr.removeFront();
+            }
+            else
+                break;
         }
-        else
-            break;
     }
-}
 
 }
 
 bool DnsDatabase::resolve(const String& hostname, uint32& addr)
 {
-   if (!Socket::getHostByName(hostname, addr))
+    if (!Socket::getHostByName(hostname, addr))
         return false;
 
     {
@@ -53,7 +53,7 @@ bool DnsDatabase::resolve(const String& hostname, uint32& addr)
             _addrToName.remove(it->addr);
             _nameToAddr.remove(it);
         }
-        AddrInfo addrInfo = {addr, Time::time()};
+        AddrInfo addrInfo = { addr, Time::time() };
         _nameToAddr.append(hostname, addrInfo);
         _addrToName.append(addr, hostname);
         _mutex.unlock();
@@ -94,7 +94,7 @@ uint32 DnsDatabase::resolveFake(const String& hostname)
 
             // reset timestamp of stored addr info
             _nameToAddr.remove(it);
-            AddrInfo addrInfo = {fakeAddr, Time::time()};
+            AddrInfo addrInfo = { fakeAddr, Time::time() };
             _nameToAddr.append(hostname, addrInfo);
         }
         else
@@ -119,7 +119,7 @@ uint32 DnsDatabase::resolveFake(const String& hostname)
                     continue;
                 break;
             }
-            AddrInfo addrInfo = {fakeAddr, Time::time()};
+            AddrInfo addrInfo = { fakeAddr, Time::time() };
             _nameToAddr.append(hostname, addrInfo);
             _addrToName.append(fakeAddr, hostname);
         }

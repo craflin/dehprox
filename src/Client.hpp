@@ -9,12 +9,12 @@
 #include "Settings.hpp"
 
 class Client : public Connection::ICallback
-             , public DirectLine::ICallback
-             , public ProxyLine::ICallback
+    , public DirectLine::ICallback
+    , public ProxyLine::ICallback
 {
 public:
     class ICallback
-    {;
+    {
     public:
         virtual void onClosed(Client& client) = 0;
 

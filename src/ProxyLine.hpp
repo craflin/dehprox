@@ -28,7 +28,7 @@ public:
 
     bool connect(const String& hostname, int16 port);
 
-    Server::Handle* getHandle() const {return _handle;}
+    Server::Handle* getHandle() const { return _handle; }
 
 public: // Connection::ICallback
     virtual void onOpened();
