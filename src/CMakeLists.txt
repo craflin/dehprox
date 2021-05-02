@@ -1,11 +1,8 @@
-add_subdirectory(TestProxy)
-return()
 
 set(sources
     Address.hpp
     Client.cpp
     Client.hpp
-    Connection.hpp
     DirectLine.cpp
     DirectLine.hpp
     DnsDatabase.cpp

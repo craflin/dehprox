@@ -1,14 +1,12 @@
 
 #pragma once
 
-#include <nstd/String.hpp>
-
-#include "Connection.hpp"
 #include "Settings.hpp"
 
-class Server;
+#include <nstd/String.hpp>
+#include <nstd/Socket/Server.hpp>
 
-class ProxyLine : public Connection::ICallback
+class ProxyLine : public Server::Establisher::ICallback, public Server::Client::ICallback
 {
 public:
     class ICallback
@@ -23,26 +21,29 @@ public:
     };
 
 public:
-    ProxyLine(Server& server, Server::Handle& client, ICallback& callback, const Settings& settings);
+    ProxyLine(Server& server, Server::Client& client, ICallback& callback, const Settings& settings);
     ~ProxyLine();
+
+    Server::Client* getHandle() {return _handle;}
 
     bool connect(const String& hostname, int16 port);
 
-    Server::Handle* getHandle() const { return _handle; }
+public: // Server::Establisher::ICallback
+    Server::Client::ICallback *onConnected(Server::Client &client) override;
+    void onAbolished() override;
 
-public: // Connection::ICallback
-    virtual void onOpened();
-    virtual void onRead();
-    virtual void onWrite();
-    virtual void onClosed();
-    virtual void onAbolished(uint error);
+public: // Server::Client::ICallback
+    void onRead() override;
+    void onWrite() override;
+    void onClosed() override;
 
 private:
     Server& _server;
-    Server::Handle& _client;
+    Server::Client& _client;
     ICallback& _callback;
     const Settings& _settings;
-    Server::Handle* _handle;
+    Server::Establisher* _establisher;
+    Server::Client* _handle;
     String _hostname;
     uint16 _port;
     bool _connected;

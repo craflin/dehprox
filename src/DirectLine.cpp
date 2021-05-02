@@ -3,10 +3,11 @@
 
 #include <nstd/Error.hpp>
 
-DirectLine::DirectLine(Server& server, Server::Handle& client, ICallback& callback)
+DirectLine::DirectLine(Server& server, Server::Client& client, ICallback& callback)
     : _server(server)
     , _client(client)
     , _callback(callback)
+    , _establisher(nullptr)
     , _handle(nullptr)
 {
     ;
@@ -14,47 +15,52 @@ DirectLine::DirectLine(Server& server, Server::Handle& client, ICallback& callba
 
 DirectLine::~DirectLine()
 {
+    if(_establisher)
+        _server.remove(*_establisher);
     if (_handle)
-        _server.close(*_handle);
+        _server.remove(*_handle);
+    
 }
 
 bool DirectLine::connect(const Address& address)
 {
-    _handle = _server.connect(address.addr, address.port, this);
-    if (!_handle)
+    _establisher = _server.connect(address.addr, address.port, *this);
+    if (!_establisher)
         return false;
     return true;
 }
 
-void DirectLine::onOpened()
+Server::Client::ICallback *DirectLine::onConnected(Server::Client &client)
 {
+    _handle = &client;
     _callback.onOpened(*this);
+    return this;
+}
+
+void DirectLine::onAbolished()
+{
+    _callback.onClosed(*this, Error::getErrorString());
 }
 
 void DirectLine::onRead()
 {
     byte buffer[262144];
     usize size;
-    if (!_server.read(*_handle, buffer, sizeof(buffer), size))
+    if (!_handle->read(buffer, sizeof(buffer), size))
         return;
     usize postponed = 0;
-    if (!_server.write(_client, buffer, size, &postponed))
+    if (!_client.write(buffer, size, &postponed))
         return;
     if (postponed)
-        _server.suspend(*_handle);
+        _handle->suspend();
 }
 
 void DirectLine::onWrite()
 {
-    _server.resume(_client);
+    _client.resume();
 }
 
 void DirectLine::onClosed()
 {
     _callback.onClosed(*this, "Closed by peer");
-}
-
-void DirectLine::onAbolished(uint error)
-{
-    _callback.onClosed(*this, Error::getErrorString(error));
 }
