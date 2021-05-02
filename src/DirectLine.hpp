@@ -1,12 +1,11 @@
 
 #pragma once
 
-#include "Connection.hpp"
 #include "Address.hpp"
 
-class Server;
+#include <nstd/Socket/Server.hpp>
 
-class DirectLine : public Connection::ICallback
+class DirectLine : public Server::Establisher::ICallback, public Server::Client::ICallback
 {
 public:
     class ICallback
@@ -21,23 +20,26 @@ public:
     };
 
 public:
-    DirectLine(Server& server, Server::Handle& client, ICallback& callback);
+    DirectLine(Server& server, Server::Client& client, ICallback& callback);
     ~DirectLine();
+
+    Server::Client* getHandle() {return _handle;}
 
     bool connect(const Address& address);
 
-    Server::Handle* getHandle() const { return _handle; }
+public: // Server::Establisher::ICallback
+    Server::Client::ICallback *onConnected(Server::Client &client) override;
+    void onAbolished() override;
 
-public: // Connection::ICallback
-    virtual void onOpened();
-    virtual void onRead();
-    virtual void onWrite();
-    virtual void onClosed();
-    virtual void onAbolished(uint error);
+public: // Server::Client::ICallback
+    void onRead() override;
+    void onWrite() override;
+    void onClosed() override;
 
 private:
     Server& _server;
-    Server::Handle& _client;
+    Server::Client& _client;
     ICallback& _callback;
-    Server::Handle* _handle;
+    Server::Establisher* _establisher;
+    Server::Client* _handle;
 };

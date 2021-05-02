@@ -13,4 +13,4 @@ target_link_libraries(TestProxy PRIVATE
 
 source_group("" FILES ${sources})
 
-set_property(TARGET TestProxy PROPERTY FOLDER "")
+set_property(TARGET TestProxy PROPERTY FOLDER "src/TestProxy")

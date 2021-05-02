@@ -3,12 +3,11 @@
 
 #include <nstd/Socket/Server.hpp>
 
-#include "Connection.hpp"
 #include "DirectLine.hpp"
 #include "ProxyLine.hpp"
 #include "Settings.hpp"
 
-class Client : public Connection::ICallback
+class Client : public Server::Client::ICallback
     , public DirectLine::ICallback
     , public ProxyLine::ICallback
 {
@@ -24,34 +23,32 @@ public:
     };
 
 public:
-    Client(Server& server, ICallback& callback, const Settings& settings);
+    Client(Server& server, Server::Client& client, ICallback& callback, const Settings& settings);
     ~Client();
 
-    bool accept(Server::Handle& listener);
+    bool init();
 
-public: // Connection::ICallback
-    virtual void onOpened() {}
-    virtual void onRead();
-    virtual void onWrite();
-    virtual void onClosed();
-    virtual void onAbolished(uint) {}
+public: // Server::Client::ICallback
+    void onRead() override;
+    void onWrite() override;
+    void onClosed() override;
 
 public: // DirectLine::ICallback
-    virtual void onOpened(DirectLine&);
-    virtual void onClosed(DirectLine&, const String& error);
+    void onOpened(DirectLine&) override;
+    void onClosed(DirectLine&, const String& error) override;
 
 public: // ProxyLine::ICallback
-    virtual void onOpened(ProxyLine&);
-    virtual void onClosed(ProxyLine&, const String& error);
+    void onOpened(ProxyLine&) override;
+    void onClosed(ProxyLine&, const String& error) override;
 
 private:
     Server& _server;
+    Server::Client& _handle;
     ICallback& _callback;
     const Settings& _settings;
-    Server::Handle* _handle;
     ProxyLine* _proxyLine;
     DirectLine* _directLine;
-    Server::Handle* _activeLine;
+    Server::Client* _activeLine;
     Address _address;
     Address _destination;
     String _destinationHostname;

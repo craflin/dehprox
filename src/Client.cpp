@@ -28,11 +28,11 @@ bool getOriginalDst(Socket& s, uint32& addr, uint16& port)
 #endif
 }
 
-Client::Client(Server& server, ICallback& callback, const Settings& settings)
+Client::Client(Server& server, Server::Client& client, ICallback& callback, const Settings& settings)
     : _server(server)
+    , _handle(client)
     , _callback(callback)
     , _settings(settings)
-    , _handle(nullptr)
     , _proxyLine(nullptr)
     , _directLine(nullptr)
     , _activeLine(nullptr)
@@ -42,25 +42,17 @@ Client::Client(Server& server, ICallback& callback, const Settings& settings)
 
 Client::~Client()
 {
-    if (_handle)
-    {
-        _server.close(*_handle);
-
-        Log::debugf("%s: Closed client for %s:%hu (%s)", (const char*)Socket::inetNtoA(_address.addr),
+    _server.remove(_handle);
+    Log::debugf("%s: Closed client for %s:%hu (%s)", (const char*)Socket::inetNtoA(_address.addr),
             (const char*)Socket::inetNtoA(_destination.addr), _destination.port, (const char*)_destinationHostname);
-    }
     delete _proxyLine;
     delete _directLine;
 }
 
-bool Client::accept(Server::Handle& listener)
+bool Client::init()
 {
-    _handle = _server.accept(listener, this, &_address.addr, &_address.port, true);
-    if (!_handle)
-        return false;
-    Socket* clientSocket = _server.getSocket(*_handle);
-    if (!clientSocket ||
-        !getOriginalDst(*clientSocket, _destination.addr, _destination.port))
+    Socket& clientSocket = _handle.getSocket();
+    if (!getOriginalDst(clientSocket, _destination.addr, _destination.port))
         return false;
 
     bool directConnect = false;
@@ -92,8 +84,6 @@ bool Client::accept(Server::Handle& listener)
 
     if (rejectReason)
     {
-        _server.close(*_handle);
-        _handle = nullptr;
         Log::infof("%s: Rejected client for %s:%hu (%s): %s", (const char*)Socket::inetNtoA(_address.addr),
             (const char*)Socket::inetNtoA(_destination.addr), _destination.port, (const char*)_destinationHostname, rejectReason);
         return false;
@@ -104,14 +94,14 @@ bool Client::accept(Server::Handle& listener)
 
     if (directConnect)
     {
-        _directLine = new DirectLine(_server, *_handle, *this);
+        _directLine = new DirectLine(_server, _handle, *this);
         if (!_directLine->connect(_destination))
             return false;
     }
 
     if (proxyConnect)
     {
-        _proxyLine = new ProxyLine(_server, *_handle, *this, _settings);
+        _proxyLine = new ProxyLine(_server, _handle, *this, _settings);
         if (!_proxyLine->connect(_destinationHostname, _destination.port))
             return false;
     }
@@ -123,19 +113,19 @@ void Client::onRead()
 {
     byte buffer[262144];
     usize size;
-    if (!_server.read(*_handle, buffer, sizeof(buffer), size))
+    if (!_handle.read(buffer, sizeof(buffer), size))
         return;
     usize postponed = 0;
-    if (!_server.write(*_activeLine, buffer, size, &postponed))
+    if (!_activeLine->write(buffer, size, &postponed))
         return;
     if (postponed)
-        _server.suspend(*_handle);
+        _handle.suspend();
 }
 
 void Client::onWrite()
 {
     if (_activeLine)
-        _server.resume(*_activeLine);
+        _activeLine->resume();
 }
 
 void Client::onClosed()
@@ -150,7 +140,7 @@ void Client::onOpened(DirectLine&)
     _proxyLine = nullptr;
     Log::infof("%s: Established direct connection with %s:%hu", (const char*)Socket::inetNtoA(_address.addr),
         (const char*)_destinationHostname, _destination.port);
-    _server.resume(*_handle);
+    _handle.resume();
 }
 
 void Client::onClosed(DirectLine&, const String& error)
@@ -168,7 +158,7 @@ void Client::onOpened(ProxyLine&)
     _directLine = nullptr;
     Log::infof("%s: Established proxy connection with %s:%hu", (const char*)Socket::inetNtoA(_address.addr),
         (const char*)_destinationHostname, _destination.port);
-    _server.resume(*_handle);
+    _handle.resume();
 }
 
 void Client::onClosed(ProxyLine&, const String& error)

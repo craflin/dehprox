@@ -2,27 +2,29 @@
 #pragma once
 
 #include <nstd/Socket/Server.hpp>
+#include <nstd/PoolList.hpp>
 
 #include "Client.hpp"
-#include "Address.hpp"
 #include "Settings.hpp"
 
-class ProxyServer : public Client::ICallback
+class ProxyServer : public Server::Listener::ICallback
+    , public Client::ICallback
 {
 public:
     ProxyServer(const Settings& settings);
 
     bool start();
 
-    uint run();
+    void run();
+
+public: // Server::Listener::ICallback
+    Server::Client::ICallback *onAccepted(Server::Client &client, uint32 ip, uint16 port) override;
 
 public: // Client::ICallback
-    virtual void onClosed(Client& client);
+    void onClosed(Client& client) override;
 
 private:
     const Settings& _settings;
     Server _server;
-
-private:
-    void accept(Server::Handle& listener);
+    PoolList<::Client> _clients;
 };

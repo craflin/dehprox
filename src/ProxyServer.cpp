@@ -12,46 +12,28 @@ ProxyServer::ProxyServer(const Settings& settings) : _settings(settings)
 
 bool ProxyServer::start()
 {
-    if (!_server.listen(_settings.listenAddr.addr, _settings.listenAddr.port, nullptr))
+    if (!_server.listen(_settings.listenAddr.addr, _settings.listenAddr.port, *this))
         return false;
     return true;
 }
 
-uint ProxyServer::run()
+void ProxyServer::run()
 {
-    for (Server::Event event; _server.poll(event);)
-        switch (event.type)
-        {
-        case Server::Event::failType:
-            ((Connection::ICallback*)event.userData)->onAbolished(Error::getLastError());
-            break;
-        case Server::Event::openType:
-            ((Connection::ICallback*)event.userData)->onOpened();
-            break;
-        case Server::Event::readType:
-            ((Connection::ICallback*)event.userData)->onRead();
-            break;
-        case Server::Event::writeType:
-            ((Connection::ICallback*)event.userData)->onWrite();
-            break;
-        case Server::Event::closeType:
-            ((Connection::ICallback*)event.userData)->onClosed();
-            break;
-        case Server::Event::acceptType:
-            accept(*event.handle);
-            break;
-        }
-    return 1;
+    _server.run();
 }
 
-void ProxyServer::accept(Server::Handle& listener)
+Server::Client::ICallback *ProxyServer::onAccepted(Server::Client &client_, uint32 ip, uint16 port)
 {
-    Client* client = new Client(_server, *this, _settings);
-    if (!client->accept(listener))
-        delete client;
+    ::Client& client = _clients.append<Server&, Server::Client&, Client::ICallback&, const Settings&>(_server, client_, *this, _settings);
+    if (!client.init())
+    {
+        _clients.remove(client);
+        return nullptr;
+    }
+    return &client;
 }
 
 void ProxyServer::onClosed(Client& client)
 {
-    delete &client;
+    _clients.remove(client);
 }
