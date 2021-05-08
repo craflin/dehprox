@@ -24,7 +24,7 @@ DirectLine::~DirectLine()
 
 bool DirectLine::connect(const Address& address)
 {
-    _establisher = _server.connect(address.addr, address.port, *this);
+    _establisher = _server.connect(address.address, address.port, *this);
     if (!_establisher)
         return false;
     return true;

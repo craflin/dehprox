@@ -23,7 +23,7 @@ add_executable(dehprox
 )
 
 target_link_libraries(dehprox PRIVATE
-    libnstd::Core libnstd::Socket
+    libnstd::Core libnstd::Socket libnstd::Document
 )
 
 source_group("" FILES ${sources})

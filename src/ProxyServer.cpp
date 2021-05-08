@@ -12,7 +12,7 @@ ProxyServer::ProxyServer(const Settings& settings) : _settings(settings)
 
 bool ProxyServer::start()
 {
-    if (!_server.listen(_settings.listenAddr.addr, _settings.listenAddr.port, *this))
+    if (!_server.listen(_settings.server.listenAddress.address, _settings.server.listenAddress.port, *this))
         return false;
     return true;
 }

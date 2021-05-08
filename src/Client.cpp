@@ -43,8 +43,8 @@ Client::Client(Server& server, Server::Client& client, ICallback& callback, cons
 Client::~Client()
 {
     _server.remove(_handle);
-    Log::debugf("%s: Closed client for %s:%hu (%s)", (const char*)Socket::inetNtoA(_address.addr),
-            (const char*)Socket::inetNtoA(_destination.addr), _destination.port, (const char*)_destinationHostname);
+    Log::debugf("%s: Closed client for %s:%hu (%s)", (const char*)Socket::inetNtoA(_address.address),
+            (const char*)Socket::inetNtoA(_destination.address), _destination.port, (const char*)_destinationHostname);
     delete _proxyLine;
     delete _directLine;
 }
@@ -52,23 +52,23 @@ Client::~Client()
 bool Client::init()
 {
     Socket& clientSocket = _handle.getSocket();
-    if (!getOriginalDst(clientSocket, _destination.addr, _destination.port))
+    if (!getOriginalDst(clientSocket, _destination.address, _destination.port))
         return false;
 
     bool directConnect = false;
     bool proxyConnect = false;
     const char* rejectReason = nullptr;
-    if (DnsDatabase::reverseResolveFake(_destination.addr, _destinationHostname))
+    if (DnsDatabase::reverseResolveFake(_destination.address, _destinationHostname))
         proxyConnect = true;
-    else if (DnsDatabase::reverseResolve(_destination.addr, _destinationHostname))
+    else if (DnsDatabase::reverseResolve(_destination.address, _destinationHostname))
     {
-        directConnect = _settings.autoProxySkip;
+        directConnect = _settings.server.autoProxySkip;
         proxyConnect = true;
     }
-    else if (!DnsDatabase::isFake(_destination.addr))
+    else if (!DnsDatabase::isFake(_destination.address))
     {
-        _destinationHostname = Socket::inetNtoA(_destination.addr);
-        directConnect = _settings.autoProxySkip;
+        _destinationHostname = Socket::inetNtoA(_destination.address);
+        directConnect = _settings.server.autoProxySkip;
         proxyConnect = true;
     }
     else
@@ -84,13 +84,13 @@ bool Client::init()
 
     if (rejectReason)
     {
-        Log::infof("%s: Rejected client for %s:%hu (%s): %s", (const char*)Socket::inetNtoA(_address.addr),
-            (const char*)Socket::inetNtoA(_destination.addr), _destination.port, (const char*)_destinationHostname, rejectReason);
+        Log::infof("%s: Rejected client for %s:%hu (%s): %s", (const char*)Socket::inetNtoA(_address.address),
+            (const char*)Socket::inetNtoA(_destination.address), _destination.port, (const char*)_destinationHostname, rejectReason);
         return false;
     }
 
-    Log::debugf("%s: Accepted client for %s:%hu (%s)", (const char*)Socket::inetNtoA(_address.addr),
-        (const char*)Socket::inetNtoA(_destination.addr), _destination.port, (const char*)_destinationHostname);
+    Log::debugf("%s: Accepted client for %s:%hu (%s)", (const char*)Socket::inetNtoA(_address.address),
+        (const char*)Socket::inetNtoA(_destination.address), _destination.port, (const char*)_destinationHostname);
 
     if (directConnect)
     {
@@ -138,7 +138,7 @@ void Client::onOpened(DirectLine&)
     _activeLine = _directLine->getHandle();
     delete _proxyLine;
     _proxyLine = nullptr;
-    Log::infof("%s: Established direct connection with %s:%hu", (const char*)Socket::inetNtoA(_address.addr),
+    Log::infof("%s: Established direct connection with %s:%hu", (const char*)Socket::inetNtoA(_address.address),
         (const char*)_destinationHostname, _destination.port);
     _handle.resume();
 }
@@ -156,7 +156,7 @@ void Client::onOpened(ProxyLine&)
     _activeLine = _proxyLine->getHandle();
     delete _directLine;
     _directLine = nullptr;
-    Log::infof("%s: Established proxy connection with %s:%hu", (const char*)Socket::inetNtoA(_address.addr),
+    Log::infof("%s: Established proxy connection with %s:%hu", (const char*)Socket::inetNtoA(_address.address),
         (const char*)_destinationHostname, _destination.port);
     _handle.resume();
 }
@@ -172,7 +172,7 @@ void Client::onClosed(ProxyLine&, const String& error)
 void Client::close(const String& error)
 {
     if (!_activeLine)
-        Log::infof("%s: Failed to establish connection with %s:%hu: %s", (const char*)Socket::inetNtoA(_address.addr),
+        Log::infof("%s: Failed to establish connection with %s:%hu: %s", (const char*)Socket::inetNtoA(_address.address),
         (const char*)_destinationHostname, _destination.port, (const char*)error);
     _callback.onClosed(*this);
 }

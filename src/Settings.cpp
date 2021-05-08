@@ -5,14 +5,6 @@
 #include <nstd/List.hpp>
 #include <nstd/Log.hpp>
 
-Settings::Settings() : autoProxySkip(true)
-{
-    httpProxyAddr.addr = Socket::loopbackAddr;
-    httpProxyAddr.port = 3128;
-    listenAddr.port = 62124;
-    dnsListenAddr.port = 62124;
-}
-
 void Settings::loadSettings(const String& file, Settings& settings)
 {
     String conf;
@@ -35,17 +27,17 @@ void Settings::loadSettings(const String& file, Settings& settings)
             continue;
         const String& option = *tokens.begin();
         const String& value = *(++tokens.begin());
-        if (option == "httpProxyAddr")
-            settings.httpProxyAddr.addr = Socket::inetAddr(value, &settings.httpProxyAddr.port);
-        else if (option == "listenAddr")
-            settings.listenAddr.addr = Socket::inetAddr(value, &settings.listenAddr.port);
-        else if (option == "dnsListenAddr")
-            settings.dnsListenAddr.addr = Socket::inetAddr(value, &settings.dnsListenAddr.port);
-        else if (option == "autoProxySkip")
-            settings.autoProxySkip = value.toBool();
-        else if (option == "allowDest")
+        if (option == "server.proxy" || option == "httpProxyAddr")
+            settings.server.httpProxyAddress.address = Socket::inetAddr(value, &settings.server.httpProxyAddress.port);
+        else if (option == "server.listenAddress" || option == "listenAddr")
+            settings.server.listenAddress.address = Socket::inetAddr(value, &settings.server.listenAddress.port);
+        else if (option == "dns.listenAddress" || option == "dnsListenAddr")
+            settings.dns.listenAddress.address = Socket::inetAddr(value, &settings.dns.listenAddress.port);
+        else if (option == "server.autoProxySkip" || option == "autoProxySkip")
+            settings.server.autoProxySkip = value.toBool();
+        else if (option == "allow" || option == "allowDest")
             settings.whiteList.append(value);
-        else if (option == "denyDest")
+        else if (option == "deny" || option == "denyDest")
             settings.blackList.append(value);
         else
             Log::warningf("Unknown option: %s", (const char*)option);

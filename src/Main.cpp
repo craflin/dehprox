@@ -74,22 +74,22 @@ int main(int argc, char* argv[])
 
     // start dns server
     DnsServer dnsServer(settings);
-    if (settings.dnsListenAddr.port)
+    if (settings.dns.listenAddress.port)
     {
         if (!dnsServer.start())
-            return Log::errorf("Could not start DNS server on UDP port %s:%hu: %s", (const char*)Socket::inetNtoA(settings.dnsListenAddr.addr), (uint16)settings.dnsListenAddr.port, (const char*)Socket::getErrorString()), 1;
-        Log::infof("Listening on UDP port %hu...", (uint16)settings.dnsListenAddr.port);
+            return Log::errorf("Could not start DNS server on UDP port %s:%hu: %s", (const char*)Socket::inetNtoA(settings.dns.listenAddress.address), (uint16)settings.dns.listenAddress.port, (const char*)Socket::getErrorString()), 1;
+        Log::infof("Listening on UDP port %hu...", (uint16)settings.dns.listenAddress.port);
     }
 
     // start transparent proxy server
     ProxyServer proxyServer(settings);
     if (!proxyServer.start())
-        return Log::errorf("Could not start proxy server on TCP port %s:%hu: %s", (const char*)Socket::inetNtoA(settings.listenAddr.addr), (uint16)settings.listenAddr.port, (const char*)Socket::getErrorString()), 1;
-    Log::infof("Listening on TCP port %hu...", (uint16)settings.listenAddr.port);
+        return Log::errorf("Could not start proxy server on TCP port %s:%hu: %s", (const char*)Socket::inetNtoA(settings.server.listenAddress.address), (uint16)settings.server.listenAddress.port, (const char*)Socket::getErrorString()), 1;
+    Log::infof("Listening on TCP port %hu...", (uint16)settings.server.listenAddress.port);
 
     // run dns server
     Thread dnsThread;
-    if (settings.dnsListenAddr.port)
+    if (settings.dns.listenAddress.port)
     {
         if (!dnsThread.start(dnsServer, &DnsServer::run))
             return Log::errorf("Could not start thread: %s", (const char*)Socket::getErrorString()), 1;

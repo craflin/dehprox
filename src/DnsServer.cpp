@@ -109,7 +109,7 @@ bool DnsServer::start()
 {
     if (!_socket.open(Socket::udpProtocol) ||
         !_socket.setReuseAddress() ||
-        !_socket.bind(_settings.dnsListenAddr.addr, _settings.dnsListenAddr.port))
+        !_socket.bind(_settings.dns.listenAddress.address, _settings.dns.listenAddress.port))
         return false;
     return true;
 }
@@ -125,7 +125,7 @@ uint DnsServer::run()
     const byte* responseEnd = response + sizeof(response);
     for (;;)
     {
-        ssize size = _socket.recvFrom(query, sizeof(query), sender.addr, sender.port);
+        ssize size = _socket.recvFrom(query, sizeof(query), sender.address, sender.port);
         if (size < 0)
             break;
         if (size < sizeof(DnsHeader))
@@ -159,7 +159,7 @@ uint DnsServer::run()
 
                 if (rejectReason)
                 {
-                    Log::infof("%s: Ignored DNS query for %s: %s", (const char*)Socket::inetNtoA(sender.addr), (const char*)hostname, rejectReason);
+                    Log::infof("%s: Ignored DNS query for %s: %s", (const char*)Socket::inetNtoA(sender.address), (const char*)hostname, rejectReason);
                     continue; // don't try to resolve black listed hostnames to keep them out of the DnsDatabase
                 }
 
@@ -169,14 +169,14 @@ uint DnsServer::run()
                 {
                     if (!hostname.find('.'))
                     {
-                        Log::debugf("%s: Ignored DNS query for %s", (const char*)Socket::inetNtoA(sender.addr), (const char*)hostname);
+                        Log::debugf("%s: Ignored DNS query for %s", (const char*)Socket::inetNtoA(sender.address), (const char*)hostname);
                         continue;
                     }
                     addr = DnsDatabase::resolveFake(hostname);
                     isFakeAddr = true;
                 }
 
-                Log::debugf("%s: Answered DNS query for %s with %s%s", (const char*)Socket::inetNtoA(sender.addr),
+                Log::debugf("%s: Answered DNS query for %s with %s%s", (const char*)Socket::inetNtoA(sender.address),
                     (const char*)hostname, (const char*)Socket::inetNtoA(addr), isFakeAddr ? " (surrogate)" : "");
 
                 if (!appendAnswer(responsePos, responseEnd, question, pointerPos - query, addr))
@@ -191,7 +191,7 @@ uint DnsServer::run()
             responseHeader->additionalRecordCount = 0;
 
             // send response
-            _socket.sendTo((byte*)responseHeader, responsePos - (byte*)responseHeader, sender.addr, sender.port);
+            _socket.sendTo((byte*)responseHeader, responsePos - (byte*)responseHeader, sender.address, sender.port);
         }
     ignoreRequest:;
     }

@@ -23,11 +23,11 @@ endfunction()
 
 set(DISABLE_ADD_SUBDIRECTORY True)
 function(add_subdirectory)
-    if(NOT DISABLE_ADD_SUBDIRECTORY OR "${ARGV0}" STREQUAL "libnstd" OR "${ARGV0}" STREQUAL "src" OR "${ARGV0}" STREQUAL "Socket")
+    if(NOT DISABLE_ADD_SUBDIRECTORY OR "${ARGV0}" STREQUAL "libnstd" OR "${ARGV0}" STREQUAL "src" OR "${ARGV0}" STREQUAL "Socket" OR "${ARGV0}" STREQUAL "Document")
         _add_subdirectory(${ARGV})
     endif()
 endfunction()
 
 add_subdirectory(libnstd)
 
-set_property(TARGET nstd nstdSocket PROPERTY FOLDER "3rdparty")
+set_property(TARGET nstd nstdSocket nstdDocument PROPERTY FOLDER "3rdparty")

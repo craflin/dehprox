@@ -340,7 +340,7 @@ int main(int argc, char* argv[])
 
     Listener listener(server);
 
-    if (!server.listen(Socket::anyAddr, port, listener))
+    if (!server.listen(Socket::anyAddress, port, listener))
         return Log::errorf("Could not start proxy server on TCP port %hu: %s", (uint16)port, (const char*)Socket::getErrorString()), 1;
     Log::infof("Listening on TCP port %hu...", (uint16)port);
 

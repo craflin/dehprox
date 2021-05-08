@@ -5,8 +5,10 @@
 
 struct Address
 {
-    uint32 addr;
+    uint32 address;
     uint16 port;
 
-    Address() : addr(Socket::anyAddr), port(0) {}
+    Address() : address(Socket::anyAddress), port(0) {}
+    Address(uint16 port) : address(Socket::anyAddress), port(port) {}
+    Address(uint32 addr, uint16 port) : address(addr), port(port) {}
 };

@@ -28,7 +28,7 @@ bool ProxyLine::connect(const String& hostname, int16 port)
 {
     _hostname = hostname;
     _port = port;
-    _establisher = _server.connect(_settings.httpProxyAddr.addr, _settings.httpProxyAddr.port, *this);
+    _establisher = _server.connect(_settings.server.httpProxyAddress.address, _settings.server.httpProxyAddress.port, *this);
     if (!_establisher)
         return false;
     return true;
