@@ -20,9 +20,9 @@ struct Settings
     {
         Address listenAddress;
         Address httpProxyAddress;
-        bool autoProxySkip;
+        uint proxyLayers;
 
-        Server() : listenAddress(62124), httpProxyAddress(Socket::loopbackAddress, 3128), autoProxySkip(true) {}
+        Server() : listenAddress(62124), httpProxyAddress(Socket::loopbackAddress, 3128), proxyLayers(0) {}
     };
 
     Dns dns;

@@ -62,13 +62,13 @@ bool Client::init()
         proxyConnect = true;
     else if (DnsDatabase::reverseResolve(_destination.address, _destinationHostname))
     {
-        directConnect = _settings.server.autoProxySkip;
+        directConnect = _settings.server.proxyLayers == 0;
         proxyConnect = true;
     }
     else if (!DnsDatabase::isFake(_destination.address))
     {
         _destinationHostname = Socket::inetNtoA(_destination.address);
-        directConnect = _settings.server.autoProxySkip;
+        directConnect = _settings.server.proxyLayers == 0;
         proxyConnect = true;
     }
     else

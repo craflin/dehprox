@@ -27,19 +27,19 @@ void Settings::loadSettings(const String& file, Settings& settings)
             continue;
         const String& option = *tokens.begin();
         const String& value = *(++tokens.begin());
-        if (option == "dns.listenAddress" || option == "dnsListenAddr")
+        if (option == "dns.listenAddress" )
             settings.dns.listenAddress.address = Socket::inetAddr(value, &settings.dns.listenAddress.port);
         else if (option == "dns.resolveAddresses")
             settings.dns.resolveAddresses = value.toBool();
-        else if (option == "server.proxy" || option == "httpProxyAddr")
+        else if (option == "server.proxy")
             settings.server.httpProxyAddress.address = Socket::inetAddr(value, &settings.server.httpProxyAddress.port);
-        else if (option == "server.listenAddress" || option == "listenAddr")
+        else if (option == "server.listenAddress")
             settings.server.listenAddress.address = Socket::inetAddr(value, &settings.server.listenAddress.port);
-        else if (option == "server.autoProxySkip" || option == "autoProxySkip")
-            settings.server.autoProxySkip = value.toBool();
-        else if (option == "allow" || option == "allowDest")
+        else if (option == "server.proxyLayers")
+            settings.server.proxyLayers = value.toUInt();
+        else if (option == "allow")
             settings.whiteList.append(value);
-        else if (option == "deny" || option == "denyDest")
+        else if (option == "deny")
             settings.blackList.append(value);
         else
             Log::warningf("Unknown option: %s", (const char*)option);
