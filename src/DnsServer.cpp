@@ -165,7 +165,7 @@ uint DnsServer::run()
 
                 uint32 addr;
                 bool isFakeAddr = false;
-                if (!DnsDatabase::resolve(hostname, addr))
+                if (!_settings.dns.resolveAddresses || !DnsDatabase::resolve(hostname, addr))
                 {
                     if (!hostname.find('.'))
                     {

@@ -27,12 +27,14 @@ void Settings::loadSettings(const String& file, Settings& settings)
             continue;
         const String& option = *tokens.begin();
         const String& value = *(++tokens.begin());
-        if (option == "server.proxy" || option == "httpProxyAddr")
+        if (option == "dns.listenAddress" || option == "dnsListenAddr")
+            settings.dns.listenAddress.address = Socket::inetAddr(value, &settings.dns.listenAddress.port);
+        else if (option == "dns.resolveAddresses")
+            settings.dns.resolveAddresses = value.toBool();
+        else if (option == "server.proxy" || option == "httpProxyAddr")
             settings.server.httpProxyAddress.address = Socket::inetAddr(value, &settings.server.httpProxyAddress.port);
         else if (option == "server.listenAddress" || option == "listenAddr")
             settings.server.listenAddress.address = Socket::inetAddr(value, &settings.server.listenAddress.port);
-        else if (option == "dns.listenAddress" || option == "dnsListenAddr")
-            settings.dns.listenAddress.address = Socket::inetAddr(value, &settings.dns.listenAddress.port);
         else if (option == "server.autoProxySkip" || option == "autoProxySkip")
             settings.server.autoProxySkip = value.toBool();
         else if (option == "allow" || option == "allowDest")

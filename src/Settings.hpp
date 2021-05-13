@@ -11,8 +11,9 @@ struct Settings
     struct Dns
     {
         Address listenAddress;
+        bool resolveAddresses;
 
-        Dns() : listenAddress(62124) {}
+        Dns() : listenAddress(62124), resolveAddresses(true) {}
     };
 
     struct Server
