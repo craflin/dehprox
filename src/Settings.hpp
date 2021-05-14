@@ -19,10 +19,16 @@ struct Settings
     struct Server
     {
         Address listenAddress;
-        Address httpProxyAddress;
+        HashSet<Address> proxies;
         uint proxyLayers;
+        uint connectConcurrency;
+        uint connectTimeout;
+        uint connectMaxAttempts;
+        uint connectionProvision;
+        HashSet<String> proxyProviders;
+        uint proxyRefreshInterval;
 
-        Server() : listenAddress(62124), httpProxyAddress(Socket::loopbackAddress, 3128), proxyLayers(0) {}
+        Server() : listenAddress(62124),  proxyLayers(0), connectConcurrency(1), connectTimeout(20), connectMaxAttempts(2), connectionProvision(2), proxyRefreshInterval(172800) {}
     };
 
     Dns dns;
