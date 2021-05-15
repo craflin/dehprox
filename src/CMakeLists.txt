@@ -10,6 +10,10 @@ set(sources
     DnsServer.cpp
     DnsServer.hpp
     Main.cpp
+    ProxyConnection.cpp
+    ProxyConnection.hpp
+    ProxyDatabase.cpp
+    ProxyDatabase.hpp
     ProxyLine.cpp
     ProxyLine.hpp
     ProxyServer.cpp

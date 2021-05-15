@@ -6,13 +6,15 @@
 #include <nstd/String.hpp>
 #include <nstd/Socket/Server.hpp>
 
-class ProxyLine : public Server::Establisher::ICallback, public Server::Client::ICallback
+class ProxyConnection;
+
+class ProxyLine : public Server::Client::ICallback
 {
 public:
     class ICallback
     {
     public:
-        virtual void onOpened(ProxyLine&) = 0;
+        virtual void onConnected(ProxyLine&) = 0;
         virtual void onClosed(ProxyLine&, const String& error) = 0;
 
     protected:
@@ -21,16 +23,12 @@ public:
     };
 
 public:
-    ProxyLine(Server& server, Server::Client& client, ICallback& callback, const Settings& settings);
-    ~ProxyLine();
+    ProxyLine(Server& server, Server::Client& client,  ProxyConnection& proxy, ICallback& callback, const Settings& settings);
 
-    Server::Client* getHandle() {return _handle;}
+    Server::Client& getHandle() { return _handle; }
+    ProxyConnection& getProxyConnection() { return _proxy; }
 
-    bool connect(const String& hostname, int16 port);
-
-public: // Server::Establisher::ICallback
-    Server::Client::ICallback *onConnected(Server::Client &client) override;
-    void onAbolished() override;
+    bool connect(const String& hostname, uint16 port);
 
 public: // Server::Client::ICallback
     void onRead() override;
@@ -40,12 +38,10 @@ public: // Server::Client::ICallback
 private:
     Server& _server;
     Server::Client& _client;
+    Server::Client& _handle;
     ICallback& _callback;
     const Settings& _settings;
-    Server::Establisher* _establisher;
-    Server::Client* _handle;
-    String _hostname;
-    uint16 _port;
+    ProxyConnection& _proxy;
     bool _connected;
     String _proxyResponse;
 };

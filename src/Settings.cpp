@@ -32,7 +32,11 @@ void Settings::loadSettings(const String& file, Settings& settings)
         else if (option == "dns.resolveAddresses")
             settings.dns.resolveAddresses = value.toBool();
         else if (option == "server.proxy")
-            settings.server.httpProxyAddress.address = Socket::inetAddr(value, &settings.server.httpProxyAddress.port);
+        {
+            Address address;
+            address.address = Socket::inetAddr(value, &address.port);
+            settings.server.proxies.append(address);
+        }
         else if (option == "server.listenAddress")
             settings.server.listenAddress.address = Socket::inetAddr(value, &settings.server.listenAddress.port);
         else if (option == "server.proxyLayers")

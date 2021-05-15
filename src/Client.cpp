@@ -33,9 +33,9 @@ Client::Client(Server& server, Server::Client& client, ICallback& callback, cons
     , _handle(client)
     , _callback(callback)
     , _settings(settings)
-    , _proxyLine(nullptr)
     , _directLine(nullptr)
     , _activeLine(nullptr)
+    , _failedProxyConnections(0)
 {
     ;
 }
@@ -45,7 +45,6 @@ Client::~Client()
     _server.remove(_handle);
     Log::debugf("%s: Closed client for %s:%hu (%s)", (const char*)Socket::inetNtoA(_address.address),
             (const char*)Socket::inetNtoA(_destination.address), _destination.port, (const char*)_destinationHostname);
-    delete _proxyLine;
     delete _directLine;
 }
 
@@ -56,20 +55,19 @@ bool Client::init()
         return false;
 
     bool directConnect = false;
-    bool proxyConnect = false;
     const char* rejectReason = nullptr;
     if (DnsDatabase::reverseResolveFake(_destination.address, _destinationHostname))
-        proxyConnect = true;
+    {
+        ;
+    }
     else if (DnsDatabase::reverseResolve(_destination.address, _destinationHostname))
     {
         directConnect = _settings.server.proxyLayers == 0;
-        proxyConnect = true;
     }
     else if (!DnsDatabase::isFake(_destination.address))
     {
         _destinationHostname = Socket::inetNtoA(_destination.address);
         directConnect = _settings.server.proxyLayers == 0;
-        proxyConnect = true;
     }
     else
         rejectReason = "Unknown surrogate address";
@@ -99,13 +97,18 @@ bool Client::init()
             return false;
     }
 
-    if (proxyConnect)
-    {
-        _proxyLine = new ProxyLine(_server, _handle, *this, _settings);
-        if (!_proxyLine->connect(_destinationHostname, _destination.port))
-            return false;
-    }
+    _handle.suspend();
+    return true;
+}
 
+bool Client::connect(ProxyConnection& proxy)
+{
+    ProxyLine& proxyLine = _proxyLines.append<Server&, Server::Client&,  ProxyConnection&, ProxyLine::ICallback&, const Settings&>(_server, _handle, proxy, *this, _settings);
+    if (!proxyLine.connect(_destinationHostname, _destination.port))
+    {
+        _proxyLines.remove(proxyLine);
+        return false;
+    }
     return true;
 }
 
@@ -133,40 +136,69 @@ void Client::onClosed()
     _callback.onClosed(*this);
 }
 
-void Client::onOpened(DirectLine&)
+void Client::onConnected(DirectLine&)
 {
     _activeLine = _directLine->getHandle();
-    delete _proxyLine;
-    _proxyLine = nullptr;
+
     Log::infof("%s: Established direct connection with %s:%hu", (const char*)Socket::inetNtoA(_address.address),
         (const char*)_destinationHostname, _destination.port);
     _handle.resume();
+
+    _callback.onEstablished(*this);
+
+    for (PoolList<ProxyLine>::Iterator i = _proxyLines.begin(), end = _proxyLines.begin(); i != end;)
+    {
+        ProxyLine& proxy = *i;
+        i = _proxyLines.remove(i);
+        _callback.onClosed(proxy.getProxyConnection());
+    }
+    
 }
 
 void Client::onClosed(DirectLine&, const String& error)
 {
     delete _directLine;
     _directLine = nullptr;
-    if (!_proxyLine)
+
+    if (_failedProxyConnections >= _settings.server.connectMaxAttempts)
         close(error);
 }
 
-void Client::onOpened(ProxyLine&)
+void Client::onConnected(ProxyLine& proxyLine)
 {
-    _activeLine = _proxyLine->getHandle();
+    _activeLine = &proxyLine.getHandle();
     delete _directLine;
     _directLine = nullptr;
+
     Log::infof("%s: Established proxy connection with %s:%hu", (const char*)Socket::inetNtoA(_address.address),
         (const char*)_destinationHostname, _destination.port);
     _handle.resume();
+
+    _callback.onEstablished(*this);
+
+    for (PoolList<ProxyLine>::Iterator i = _proxyLines.begin(), end = _proxyLines.begin(); i != end;)
+    {
+        ProxyLine& otherLine = *i;
+        if (&otherLine != &proxyLine)
+        {
+            i = _proxyLines.remove(i);
+            _callback.onClosed(otherLine.getProxyConnection());
+        }
+        else
+            ++i;
+    }
 }
 
-void Client::onClosed(ProxyLine&, const String& error)
+void Client::onClosed(ProxyLine& proxyLine, const String& error)
 {
-    delete _proxyLine;
-    _proxyLine = nullptr;
-    if (!_directLine)
+    _proxyLines.remove(proxyLine);
+    _callback.onClosed(proxyLine.getProxyConnection());
+
+    ++_failedProxyConnections;
+    if (_failedProxyConnections >= _settings.server.connectMaxAttempts && !_directLine)
         close(error);
+    else
+        _callback.onProxyFailed(*this);
 }
 
 void Client::close(const String& error)

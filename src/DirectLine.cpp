@@ -33,7 +33,7 @@ bool DirectLine::connect(const Address& address)
 Server::Client::ICallback *DirectLine::onConnected(Server::Client &client)
 {
     _handle = &client;
-    _callback.onOpened(*this);
+    _callback.onConnected(*this);
     return this;
 }
 

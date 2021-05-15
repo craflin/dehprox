@@ -12,3 +12,14 @@ struct Address
     Address(uint16 port) : address(Socket::anyAddress), port(port) {}
     Address(uint32 addr, uint16 port) : address(addr), port(port) {}
 };
+
+
+inline usize hash(const Address& address)
+{
+    return (address.port << 16) ^ address.address;
+}
+
+inline bool operator==(const Address& lh, const Address& rh)
+{
+    return lh.address == rh.address && lh.port == rh.port;
+}

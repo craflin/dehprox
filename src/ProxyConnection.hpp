@@ -1,18 +1,16 @@
 
 #pragma once
 
-#include "Address.hpp"
-
 #include <nstd/Socket/Server.hpp>
 
-class DirectLine : public Server::Establisher::ICallback, public Server::Client::ICallback
+class ProxyConnection : public Server::Establisher::ICallback, public Server::Client::ICallback
 {
 public:
     class ICallback
     {
     public:
-        virtual void onConnected(DirectLine&) = 0;
-        virtual void onClosed(DirectLine&, const String& error) = 0;
+        virtual void onConnected(ProxyConnection&) = 0;
+        virtual void onAbolished(ProxyConnection&) = 0;
 
     protected:
         ICallback() {}
@@ -20,12 +18,16 @@ public:
     };
 
 public:
-    DirectLine(Server& server, Server::Client& client, ICallback& callback);
-    ~DirectLine();
+    ProxyConnection(Server& server, ICallback& callback);
+    ~ProxyConnection();
 
-    Server::Client* getHandle() {return _handle;}
+    void setClientCallback(Server::Client::ICallback& callback) { _clientCallback = &callback;}
 
-    bool connect(const Address& address);
+    bool connect();
+
+    bool isConnected() {return _connected; }
+
+    Server::Client& getHandle() {return *_handle;}
 
 public: // Server::Establisher::ICallback
     Server::Client::ICallback *onConnected(Server::Client &client) override;
@@ -38,8 +40,9 @@ public: // Server::Client::ICallback
 
 private:
     Server& _server;
-    Server::Client& _client;
     ICallback& _callback;
+    Server::Client::ICallback* _clientCallback;
     Server::Establisher* _establisher;
     Server::Client* _handle;
+    bool _connected;
 };

@@ -1,58 +1,36 @@
 
 #include "ProxyLine.hpp"
+#include "ProxyDatabase.hpp"
+#include "ProxyConnection.hpp"
 
 #include <nstd/Error.hpp>
 
-ProxyLine::ProxyLine(Server& server, Server::Client& client, ICallback& callback, const Settings& settings)
+ProxyLine::ProxyLine(Server& server, Server::Client& client, ProxyConnection& proxy, ICallback& callback, const Settings& settings)
     : _server(server)
     , _client(client)
+    , _handle(proxy.getHandle())
     , _callback(callback)
     , _settings(settings)
-    , _establisher(nullptr)
-    , _handle(nullptr)
-    , _port()
+    , _proxy(proxy)
     , _connected(false)
 {
-    ;
+    proxy.setClientCallback(*this);
 }
 
-ProxyLine::~ProxyLine()
+bool ProxyLine::connect(const String& hostname, uint16 port)
 {
-    if(_establisher)
-        _server.remove(*_establisher);
-    if (_handle)
-        _server.remove(*_handle);
-}
-
-bool ProxyLine::connect(const String& hostname, int16 port)
-{
-    _hostname = hostname;
-    _port = port;
-    _establisher = _server.connect(_settings.server.httpProxyAddress.address, _settings.server.httpProxyAddress.port, *this);
-    if (!_establisher)
+    String connectMsg;
+    connectMsg.printf("CONNECT %s:%hu HTTP/1.1\r\nHost: %s:%hu\r\n\r\n", (const char*)hostname, port, (const char*)hostname, port);
+    if (!_handle.write((const byte*)(const char*)connectMsg, connectMsg.length()))
         return false;
     return true;
-}
-
-Server::Client::ICallback *ProxyLine::onConnected(Server::Client &client)
-{
-    _handle = &client;
-    String connectMsg;
-    connectMsg.printf("CONNECT %s:%hu HTTP/1.1\r\nHost: %s:%hu\r\n\r\n", (const char*)_hostname, _port, (const char*)_hostname, _port);
-    client.write((const byte*)(const char*)connectMsg, connectMsg.length());
-    return this;
-}
-
-void ProxyLine::onAbolished()
-{
-    _callback.onClosed(*this, Error::getErrorString());
 }
 
 void ProxyLine::onRead()
 {
     byte buffer[262144 + 1];
     usize size;
-    if (!_handle->read(buffer, sizeof(buffer) - 1, size))
+    if (!_handle.read(buffer, sizeof(buffer) - 1, size))
         return;
     if (_connected)
     {
@@ -60,7 +38,7 @@ void ProxyLine::onRead()
         if (!_client.write(buffer, size, &postponed))
             return;
         if (postponed)
-            _handle->suspend();
+            _handle.suspend();
     }
     else
     {
@@ -78,7 +56,7 @@ void ProxyLine::onRead()
                     _client.write((const byte*)bufferPos, remainingSize);
                 _proxyResponse = String();
                 _connected = true;
-                _callback.onOpened(*this);
+                _callback.onConnected(*this);
             }
             else
             {

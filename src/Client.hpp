@@ -2,10 +2,13 @@
 #pragma once
 
 #include <nstd/Socket/Server.hpp>
+#include <nstd/PoolList.hpp>
 
 #include "DirectLine.hpp"
 #include "ProxyLine.hpp"
 #include "Settings.hpp"
+
+class ProxyConnection;
 
 class Client : public Server::Client::ICallback
     , public DirectLine::ICallback
@@ -15,7 +18,10 @@ public:
     class ICallback
     {
     public:
+        virtual void onClosed(ProxyConnection& proxy) = 0;
         virtual void onClosed(Client& client) = 0;
+        virtual void onEstablished(Client& client) = 0;
+        virtual void onProxyFailed(Client& client) = 0;
 
     protected:
         ICallback() {}
@@ -27,6 +33,7 @@ public:
     ~Client();
 
     bool init();
+    bool connect(ProxyConnection& proxy);
 
 public: // Server::Client::ICallback
     void onRead() override;
@@ -34,11 +41,11 @@ public: // Server::Client::ICallback
     void onClosed() override;
 
 public: // DirectLine::ICallback
-    void onOpened(DirectLine&) override;
+    void onConnected(DirectLine&) override;
     void onClosed(DirectLine&, const String& error) override;
 
 public: // ProxyLine::ICallback
-    void onOpened(ProxyLine&) override;
+    void onConnected(ProxyLine&) override;
     void onClosed(ProxyLine&, const String& error) override;
 
 private:
@@ -46,12 +53,13 @@ private:
     Server::Client& _handle;
     ICallback& _callback;
     const Settings& _settings;
-    ProxyLine* _proxyLine;
+    PoolList<ProxyLine> _proxyLines;
     DirectLine* _directLine;
     Server::Client* _activeLine;
     Address _address;
     Address _destination;
     String _destinationHostname;
+    uint _failedProxyConnections;
 
 private:
     void close(const String& error);
