@@ -41,6 +41,18 @@ void Settings::loadSettings(const String& file, Settings& settings)
             settings.server.listenAddress.address = Socket::inetAddr(value, &settings.server.listenAddress.port);
         else if (option == "server.proxyLayers")
             settings.server.proxyLayers = value.toUInt();
+        else if (option == "server.connectConcurrency")
+            settings.server.connectConcurrency = value.toUInt();
+        else if (option == "server.connectTimeout")
+            settings.server.connectTimeout = value.toUInt();
+        else if (option == "server.connectMaxAttempts")
+            settings.server.connectMaxAttempts = value.toUInt();
+        else if (option == "server.connectionProvision")
+            settings.server.connectionProvision = value.toUInt();
+        else if (option == "provider.url")
+            settings.provider.urls.append(value);
+        else if (option == "provider.refreshInterval")
+            settings.provider.refreshInterval = value.toUInt();
         else if (option == "allow")
             settings.whiteList.append(value);
         else if (option == "deny")
