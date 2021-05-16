@@ -7,6 +7,7 @@
 
 #include "ProxyServer.hpp"
 #include "DnsServer.hpp"
+#include "ProxyProvider.hpp"
 
 int main(int argc, char* argv[])
 {
@@ -89,10 +90,19 @@ int main(int argc, char* argv[])
 
     // run dns server
     Thread dnsThread;
-    if (settings.dns.listenAddress.port)
+    if (dnsServer.isStarted())
     {
         if (!dnsThread.start(dnsServer, &DnsServer::run))
-            return Log::errorf("Could not start thread: %s", (const char*)Socket::getErrorString()), 1;
+            return Log::errorf("Could not start thread: %s", (const char*)Error::getErrorString()), 1;
+    }
+
+    // run proxy provider thread
+    ProxyProvider proxyProvider(settings.provider);
+    Thread providerThread;
+    if (proxyProvider.isEnabled())
+    {
+        if (!providerThread.start(proxyProvider, &ProxyProvider::run))
+            return Log::errorf("Could not start thread: %s", (const char*)Error::getErrorString()), 1;
     }
 
     // run transparent proxy server

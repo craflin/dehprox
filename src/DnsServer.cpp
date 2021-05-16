@@ -111,6 +111,7 @@ bool DnsServer::start()
         !_socket.setReuseAddress() ||
         !_socket.bind(_settings.dns.listenAddress.address, _settings.dns.listenAddress.port))
         return false;
+    _started = true;
     return true;
 }
 

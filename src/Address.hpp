@@ -13,6 +13,10 @@ struct Address
     Address(uint32 addr, uint16 port) : address(addr), port(port) {}
 };
 
+inline String toString(const Address& address)
+{
+    return Socket::inetNtoA(address.address) + String::fromUInt((uint)address.port);
+}
 
 inline usize hash(const Address& address)
 {

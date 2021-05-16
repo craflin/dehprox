@@ -5,6 +5,7 @@
 #include <nstd/Array.hpp>
 #include <nstd/Math.hpp>
 #include <nstd/HashMap.hpp>
+#include <nstd/Log.hpp>
 
 namespace {
 
@@ -23,19 +24,22 @@ namespace {
 
 }
 
-void ProxyDatabase::add(const HashSet<Address>& proxies, bool permanent)
+void ProxyDatabase::add(const List<Address>& proxies, bool permanent)
 {
     Mutex::Guard guard(_mutex);
     _proxies.reserve(_proxies.size() + proxies.size());
-    for (HashSet<Address>::Iterator i = proxies.begin(), end = proxies.end(); i != end; ++i)
+    for (List<Address>::Iterator i = proxies.begin(), end = proxies.end(); i != end; ++i)
     {
         const Address& address = *i;
+        if (_proxiesByAddress.find(address) != _proxiesByAddress.end())
+            continue;
         ProxyData& proxyData = _proxies.append(ProxyData());
         proxyData.address = address;
         proxyData.permanent = permanent;
         proxyData.rawRating = 0;
         proxyData.rating = 1;
         _proxiesByAddress.append(address, &proxyData);
+        Log::debugf("Added proxy address %s", (const char*)toString(address));
     }
 }
 

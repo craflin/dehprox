@@ -1,4 +1,6 @@
 
+find_package(CURL)
+
 set(sources
     Address.hpp
     Client.cpp
@@ -9,6 +11,8 @@ set(sources
     DnsDatabase.hpp
     DnsServer.cpp
     DnsServer.hpp
+    HttpRequest.cpp
+    HttpRequest.hpp
     Main.cpp
     ProxyConnection.cpp
     ProxyConnection.hpp
@@ -16,6 +20,8 @@ set(sources
     ProxyDatabase.hpp
     ProxyLine.cpp
     ProxyLine.hpp
+    ProxyProvider.cpp
+    ProxyProvider.hpp
     ProxyServer.cpp
     ProxyServer.hpp
     Settings.cpp
@@ -27,7 +33,7 @@ add_executable(dehprox
 )
 
 target_link_libraries(dehprox PRIVATE
-    libnstd::Core libnstd::Socket libnstd::Document
+    libnstd::Core libnstd::Socket libnstd::Document CURL::libcurl
 )
 
 source_group("" FILES ${sources})
