@@ -39,7 +39,7 @@ void ProxyDatabase::add(const List<Address>& proxies, bool permanent)
         proxyData.rawRating = 0;
         proxyData.rating = 1;
         _proxiesByAddress.append(address, &proxyData);
-        Log::debugf("Added proxy address %s", (const char*)toString(address));
+        Log::debugf("Added proxy address %s:%hu", (const char*)Socket::inetNtoA(address.address), address.port );
     }
 }
 

@@ -29,7 +29,7 @@ public:
     };
 
 public:
-    Client(Server& server, Server::Client& client, ICallback& callback, const Settings& settings);
+    Client(Server& server, Server::Client& client, Address& address, ICallback& callback, const Settings& settings);
     ~Client();
 
     bool init();
@@ -51,12 +51,12 @@ public: // ProxyLine::ICallback
 private:
     Server& _server;
     Server::Client& _handle;
+    const Address _address;
     ICallback& _callback;
     const Settings& _settings;
     PoolList<ProxyLine> _proxyLines;
     DirectLine* _directLine;
     Server::Client* _activeLine;
-    Address _address;
     Address _destination;
     String _destinationHostname;
     uint _failedProxyConnections;

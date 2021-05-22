@@ -28,9 +28,10 @@ bool getOriginalDst(Socket& s, uint32& addr, uint16& port)
 #endif
 }
 
-Client::Client(Server& server, Server::Client& client, ICallback& callback, const Settings& settings)
+Client::Client(Server& server, Server::Client& client, Address& address, ICallback& callback, const Settings& settings)
     : _server(server)
     , _handle(client)
+    , _address(address)
     , _callback(callback)
     , _settings(settings)
     , _directLine(nullptr)
@@ -134,6 +135,9 @@ void Client::onWrite()
 void Client::onClosed()
 {
     _callback.onClosed(*this);
+    for (PoolList<ProxyLine>::Iterator i = _proxyLines.begin(), end = _proxyLines.begin(); i != end; ++i)
+        _callback.onClosed(i->getProxyConnection());
+    _proxyLines.clear();
 }
 
 void Client::onConnected(DirectLine&)
@@ -146,13 +150,9 @@ void Client::onConnected(DirectLine&)
 
     _callback.onEstablished(*this);
 
-    for (PoolList<ProxyLine>::Iterator i = _proxyLines.begin(), end = _proxyLines.begin(); i != end;)
-    {
-        ProxyLine& proxy = *i;
-        i = _proxyLines.remove(i);
-        _callback.onClosed(proxy.getProxyConnection());
-    }
-    
+    for (PoolList<ProxyLine>::Iterator i = _proxyLines.begin(), end = _proxyLines.begin(); i != end; ++i)
+        _callback.onClosed(i->getProxyConnection());
+    _proxyLines.clear();
 }
 
 void Client::onClosed(DirectLine&, const String& error)

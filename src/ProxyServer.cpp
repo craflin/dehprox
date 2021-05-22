@@ -25,7 +25,8 @@ bool ProxyServer::start()
 
 Server::Client::ICallback *ProxyServer::onAccepted(Server::Client &client_, uint32 ip, uint16 port)
 {
-    ::Client& client = _clients.append<Server&, Server::Client&, Client::ICallback&, const Settings&>(_server, client_, *this, _settings);
+    Address address(ip, port);
+    ::Client& client = _clients.append<Server&, Server::Client&, Address&, Client::ICallback&, const Settings&>(_server, client_, address, *this, _settings);
     if (!client.init())
     {
         _clients.remove(client);
