@@ -26,7 +26,7 @@ if(CDEPLOY_OS MATCHES "ubuntu.*" OR CDEPLOY_OS MATCHES "raspbian.*")
     set(CPACK_DEBIAN_PACKAGE_SECTION "net")
 endif()
 
-if(CDEPLOY_OS MATCHES "centos.*")
+if(CDEPLOY_OS MATCHES "centos.*" OR CDEPLOY_OS MATCHES "rocky.*")
     set(CPACK_GENERATOR "RPM")
     set(CPACK_RPM_PACKAGE_LICENSE "Apache License")
     set(CPACK_RPM_EXCLUDE_FROM_AUTO_FILELIST_ADDITION "/usr/sbin")
