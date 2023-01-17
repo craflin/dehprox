@@ -46,7 +46,7 @@ start() {
 
 stop() {
 	echo -n "Stopping $DESC: "
-	killall $DAEMON
+	kill $(pidof $DAEMON)
 	if [ $? -eq 0 ]; then
 		echo "$NAME."
 	else
