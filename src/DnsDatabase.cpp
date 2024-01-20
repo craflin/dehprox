@@ -23,15 +23,13 @@ HashMap<uint32, String> _addrToName(2000);
 
 void _cleanupAddresses()
 {
-    // remove addresses older than 15 minutes from cache
     int64 now = Time::time();
     while (!_nameToAddr.isEmpty())
     {
         const AddrInfo& addrInfo = *_nameToAddr.begin();
         if (now - addrInfo.timestamp > 15 * 60 * 1000) // 15 minutes
         {
-            if (addrInfo.addr != 0)
-                _addrToName.remove(addrInfo.addr);
+            _addrToName.remove(addrInfo.addr);
             _nameToAddr.removeFront();
         }
         else
@@ -43,42 +41,25 @@ void _cleanupAddresses()
 
 bool DnsDatabase::resolve(const String& hostname, uint32& addr)
 {
-    {
-        _mutex.lock();
-        HashMap<String, AddrInfo>::Iterator it = _nameToAddr.find(hostname);
-        if (it != _nameToAddr.end())
-        {
-            const AddrInfo& addrInfo = *it;
-            addr = addrInfo.addr;
-            bool result = addrInfo.addr != 0;
-            if (Time::time() - addrInfo.timestamp <= 10 * 60 * 1000) // the cached entry should not be older than 10 minutes
-            {
-                _mutex.unlock();
-                return result;
-            }
-        }
-        _mutex.unlock();
-    }
-
-    bool result = Socket::getHostByName(hostname, addr);
+   if (!Socket::getHostByName(hostname, addr))
+        return false;
 
     {
         _mutex.lock();
         HashMap<String, AddrInfo>::Iterator it = _nameToAddr.find(hostname);
         if (it != _nameToAddr.end())
         {
-            if (it->addr != 0)
-                _addrToName.remove(it->addr);
+            // reset timestamp of stored addr info
+            _addrToName.remove(it->addr);
             _nameToAddr.remove(it);
         }
-        AddrInfo addrInfo = {result ? addr : 0, Time::time()};
+        AddrInfo addrInfo = {addr, Time::time()};
         _nameToAddr.append(hostname, addrInfo);
-        if (result)
-            _addrToName.append(addr, hostname);
+        _addrToName.append(addr, hostname);
         _mutex.unlock();
     }
 
-    return result;
+    return true;
 }
 
 bool DnsDatabase::reverseResolve(uint32 addr, String& hostname)
@@ -107,15 +88,17 @@ uint32 DnsDatabase::resolveFake(const String& hostname)
     {
         _mutex.lock();
         HashMap<String, AddrInfo>::Iterator it = _nameToAddr.find(hostname);
-        if (it != _nameToAddr.end() && it->addr != 0)
+        if (it != _nameToAddr.end())
         {
             fakeAddr = it->addr;
+
+            // reset timestamp of stored addr info
+            _nameToAddr.remove(it);
+            AddrInfo addrInfo = {fakeAddr, Time::time()};
+            _nameToAddr.append(hostname, addrInfo);
         }
         else
         {
-            if (it != _nameToAddr.end())
-                _nameToAddr.remove(it);
-
             // create a somewhat deterministic unique fake addr using a hashsum of the hostname
             fakeAddr = hash(hostname);
             for (int i = 1;; ++i)
