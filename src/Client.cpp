@@ -89,6 +89,12 @@ bool Client::init()
         return false;
     }
 
+    if (Settings::isInList(_destinationHostname, _settings.skipProxyList))
+    {
+        directConnect = true;
+        proxyConnect = false;
+    }
+
     Log::debugf("%s: Accepted client for %s:%hu (%s)", (const char*)Socket::inetNtoA(_address.addr),
         (const char*)Socket::inetNtoA(_destination.addr), _destination.port, (const char*)_destinationHostname);
 
@@ -106,6 +112,7 @@ bool Client::init()
             return false;
     }
 
+    _handle.suspend();
     return true;
 }
 
