@@ -3,7 +3,6 @@ set(sources
     Address.hpp
     Client.cpp
     Client.hpp
-    Connection.hpp
     DirectLine.cpp
     DirectLine.hpp
     DnsDatabase.cpp
@@ -32,3 +31,6 @@ source_group("" FILES ${sources})
 set_property(TARGET dehprox PROPERTY FOLDER "src")
 
 install(TARGETS dehprox DESTINATION usr/sbin)
+
+add_subdirectory(TestProxy)
+

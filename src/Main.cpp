@@ -10,21 +10,21 @@
 
 int main(int argc, char* argv[])
 {
-  String logFile;
-  String configFile("/etc/dehprox.conf");
+    String logFile;
+    String configFile("/etc/dehprox.conf");
 
-  // parse parameters
+    // parse parameters
     {
         Process::Option options[] = {
-            {'b', "daemon", Process::argumentFlag | Process::optionalFlag},
-            {'c', "config", Process::argumentFlag},
-            {'h', "help", Process::optionFlag},
+            { 'b', "daemon", Process::argumentFlag | Process::optionalFlag },
+            { 'c', "config", Process::argumentFlag },
+            { 'h', "help", Process::optionFlag },
         };
         Process::Arguments arguments(argc, argv, options);
         int character;
         String argument;
-        while(arguments.read(character, argument))
-            switch(character)
+        while (arguments.read(character, argument))
+            switch (character)
             {
             case 'b':
                 logFile = argument.isEmpty() ? String("/dev/null") : argument;
@@ -47,8 +47,8 @@ int main(int argc, char* argv[])
     -c <file>, --config[=<file>]\n\
         Load configuration from <file>. (Default is /etc/dehprox.conf)\n\
 \n", argv[0]);
-              return -1;
-        }
+                return -1;
+            }
     }
 
     Log::setLevel(Log::debug);

@@ -47,6 +47,8 @@ void Settings::loadSettings(const String& file, Settings& settings)
             settings.whiteList.append(value);
         else if (option == "denyDest")
             settings.blackList.append(value);
+        else if (option == "skipProxyDest")
+            settings.skipProxyList.append(value);
         else
             Log::warningf("Unknown option: %s", (const char*)option);
     }

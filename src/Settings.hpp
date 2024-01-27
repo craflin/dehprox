@@ -14,6 +14,7 @@ struct Settings
     bool autoProxySkip;
     HashSet<String> whiteList;
     HashSet<String> blackList;
+    HashSet<String> skipProxyList;
 
     Settings();
 

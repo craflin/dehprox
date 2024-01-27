@@ -16,92 +16,92 @@
 namespace {
 
 #pragma pack(push, 1)
-struct DnsHeader
-{
-    uint16 id;
-    uint16 flags;
-    uint16 questionCount;
-    uint16 answerCount;
-    uint16 nameServerRecordCount;
-    uint16 additionalRecordCount;
-};
-struct DnsQuestion
-{
-    uint16 queryType;
-    uint16 queryClass;
-};
-struct DnsAnswer
-{
-    uint16 name;
-    uint16 answerType;
-    uint16 answerClass;
-    uint32 validityTime;
-    uint16 len;
-    uint32 addr;
-};
+    struct DnsHeader
+    {
+        uint16 id;
+        uint16 flags;
+        uint16 questionCount;
+        uint16 answerCount;
+        uint16 nameServerRecordCount;
+        uint16 additionalRecordCount;
+    };
+    struct DnsQuestion
+    {
+        uint16 queryType;
+        uint16 queryClass;
+    };
+    struct DnsAnswer
+    {
+        uint16 name;
+        uint16 answerType;
+        uint16 answerClass;
+        uint32 validityTime;
+        uint16 len;
+        uint32 addr;
+    };
 #pragma pack(pop)
 
 #define DNS_QR_BIT 0x80
 #define DNS_RA_BIT 0x8000
 
-bool skipQuestion(const byte*& pos, const byte* end)
-{
-    for (;;)
+    bool skipQuestion(const byte*& pos, const byte* end)
     {
-        if (pos == end)
+        for (;;)
+        {
+            if (pos == end)
+                return false;
+            uint8 len = *(pos++);
+            if (!len)
+                break;
+            if (pos + len > end)
+                return false;
+            pos += len;
+        }
+        if (pos + sizeof(DnsQuestion) > end)
             return false;
-        uint8 len = *(pos++);
-        if (!len)
-            break;
-        if (pos + len > end)
-            return false;
-        pos += len;
+        pos += sizeof(DnsQuestion);
+        return true;
     }
-    if (pos + sizeof(DnsQuestion) > end)
-        return false;
-    pos += sizeof(DnsQuestion);
-    return true;
-}
 
-bool parseQuestion(const byte*& pos, const byte* end, String& host, DnsQuestion& question)
-{
-    host.clear();
-    for (;;)
+    bool parseQuestion(const byte*& pos, const byte* end, String& host, DnsQuestion& question)
     {
-        if (pos == end)
+        host.clear();
+        for (;;)
+        {
+            if (pos == end)
+                return false;
+            uint8 len = *(pos++);
+            if (!len)
+                break;
+            if (pos + len > end)
+                return false;
+            if (!host.isEmpty())
+                host.append('.');
+            host.append((const char*)pos, len);
+            pos += len;
+        }
+        if (pos + sizeof(DnsQuestion) > end)
             return false;
-        uint8 len = *(pos++);
-        if (!len)
-            break;
-        if (pos + len > end)
-            return false;
-        if(!host.isEmpty())
-            host.append('.');
-        host.append((const char*)pos, len);
-        pos += len;
+        question.queryType = ntohs(((const DnsQuestion*)pos)->queryType);
+        question.queryClass = ntohs(((const DnsQuestion*)pos)->queryClass);
+        pos += sizeof(DnsQuestion);
+        return true;
     }
-    if (pos + sizeof(DnsQuestion) > end)
-        return false;
-    question.queryType = ntohs(((const DnsQuestion*)pos)->queryType);
-    question.queryClass = ntohs(((const DnsQuestion*)pos)->queryClass);
-    pos += sizeof(DnsQuestion);
-    return true;
-}
 
-bool appendAnswer(const byte*& pos, const byte* end, const DnsQuestion& question, usize offset, uint32 addr)
-{
-    if (pos + sizeof(DnsAnswer) > end)
-        return false;
-    DnsAnswer* answer = (DnsAnswer*)pos;
-    answer->name = htons(offset | 0xc000);
-    answer->answerType = htons(question.queryType);
-    answer->answerClass = htons(question.queryClass);
-    answer->validityTime = htonl(10 * 60); // 10 minutes
-    answer->len = htons(sizeof(uint32));
-    answer->addr = htonl(addr);
-    pos += sizeof(DnsAnswer);
-    return true;
-}
+    bool appendAnswer(const byte*& pos, const byte* end, const DnsQuestion& question, usize offset, uint32 addr)
+    {
+        if (pos + sizeof(DnsAnswer) > end)
+            return false;
+        DnsAnswer* answer = (DnsAnswer*)pos;
+        answer->name = htons(offset | 0xc000);
+        answer->answerType = htons(question.queryType);
+        answer->answerClass = htons(question.queryClass);
+        answer->validityTime = htonl(10 * 60); // 10 minutes
+        answer->len = htons(sizeof(uint32));
+        answer->addr = htonl(addr);
+        pos += sizeof(DnsAnswer);
+        return true;
+    }
 
 }
 
@@ -131,7 +131,7 @@ uint DnsServer::run()
         if (size < sizeof(DnsHeader))
             continue;
         uint16 flags = ntohs(queryHeader->flags);
-        if(flags & DNS_QR_BIT)
+        if (flags & DNS_QR_BIT)
             continue;
         uint16 questionCount = ntohs(queryHeader->questionCount);
         const byte* pos = (const byte*)(queryHeader + 1);
