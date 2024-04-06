@@ -11,34 +11,33 @@
 
 namespace {
 
-struct AddrInfo
-{
-    uint32 addr;
-    int64 timestamp;
-};
-
-Mutex _mutex;
-HashMap<String, AddrInfo> _nameToAddr(2000);
-HashMap<uint32, String> _addrToName(2000);
-
-void _cleanupAddresses()
-{
-    // remove addresses older than 15 minutes from cache
-    int64 now = Time::time();
-    while (!_nameToAddr.isEmpty())
+    struct AddrInfo
     {
-        const AddrInfo& addrInfo = *_nameToAddr.begin();
-        if (now - addrInfo.timestamp > 15 * 60 * 1000) // 15 minutes
-        {
-            if (addrInfo.addr != 0)
-                _addrToName.remove(addrInfo.addr);
-            _nameToAddr.removeFront();
-        }
-        else
-            break;
-    }
-}
+        uint32 addr;
+        int64 timestamp;
+    };
 
+    Mutex _mutex;
+    HashMap<String, AddrInfo> _nameToAddr(2000);
+    HashMap<uint32, String> _addrToName(2000);
+
+    void _cleanupAddresses()
+    {
+        // remove addresses older than 15 minutes from cache
+        int64 now = Time::time();
+        while (!_nameToAddr.isEmpty())
+        {
+            const AddrInfo& addrInfo = *_nameToAddr.begin();
+            if (now - addrInfo.timestamp > 15 * 60 * 1000) // 15 minutes
+            {
+                if (addrInfo.addr != 0)
+                    _addrToName.remove(addrInfo.addr);
+                _nameToAddr.removeFront();
+            }
+            else
+                break;
+        }
+    }
 }
 
 bool DnsDatabase::resolve(const String& hostname, uint32& addr)
