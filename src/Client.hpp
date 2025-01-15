@@ -23,7 +23,7 @@ public:
     };
 
 public:
-    Client(Server& server, Server::Client& client, ICallback& callback, const Settings& settings);
+    Client(Server& server, Server::Client& client, const Address& clientAddr, ICallback& callback, const Settings& settings);
     ~Client();
 
     bool init();
