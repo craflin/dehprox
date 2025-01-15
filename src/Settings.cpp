@@ -39,6 +39,8 @@ void Settings::loadSettings(const String& file, Settings& settings)
             settings.httpProxyAddr.addr = Socket::inetAddr(value, &settings.httpProxyAddr.port);
         else if (option == "listenAddr")
             settings.listenAddr.addr = Socket::inetAddr(value, &settings.listenAddr.port);
+        else if (option == "debugListenAddr")
+            settings.debugListenAddr.addr = Socket::inetAddr(value, &settings.debugListenAddr.port);
         else if (option == "dnsListenAddr")
             settings.dnsListenAddr.addr = Socket::inetAddr(value, &settings.dnsListenAddr.port);
         else if (option == "autoProxySkip")

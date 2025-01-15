@@ -28,6 +28,8 @@ public:
 
     bool connect(const String& hostname, int16 port);
 
+    String getDebugInfo() const;
+
 public: // Server::Establisher::ICallback
     Server::Client::ICallback *onConnected(Server::Client &client) override;
     void onAbolished() override;
@@ -48,4 +50,5 @@ private:
     uint16 _port;
     bool _connected;
     String _proxyResponse;
+    int64 _lastReadActivity;
 };

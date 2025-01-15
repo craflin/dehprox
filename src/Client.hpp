@@ -28,6 +28,8 @@ public:
 
     bool init();
 
+    String getDebugInfo() const;
+
 public: // Server::Client::ICallback
     void onRead() override;
     void onWrite() override;
@@ -52,6 +54,7 @@ private:
     Address _address;
     Address _destination;
     String _destinationHostname;
+    int64 _lastReadActivity;
 
 private:
     void close(const String& error);

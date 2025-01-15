@@ -86,6 +86,12 @@ int main(int argc, char* argv[])
     if (!proxyServer.start())
         return Log::errorf("Could not start proxy server on TCP port %s:%hu: %s", (const char*)Socket::inetNtoA(settings.listenAddr.addr), (uint16)settings.listenAddr.port, (const char*)Socket::getErrorString()), 1;
     Log::infof("Listening on TCP port %hu...", (uint16)settings.listenAddr.port);
+    if (settings.debugListenAddr.port)
+    {
+        if (!proxyServer.startDebug())
+            return Log::errorf("Could not start proxy server on debug TCP port %s:%hu: %s", (const char*)Socket::inetNtoA(settings.debugListenAddr.addr), (uint16)settings.debugListenAddr.port, (const char*)Socket::getErrorString()), 1;
+        Log::infof("Listening on debug TCP port %hu...", (uint16)settings.debugListenAddr.port);
+    }
 
     // run dns server
     Thread dnsThread;

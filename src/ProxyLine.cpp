@@ -2,6 +2,7 @@
 #include "ProxyLine.hpp"
 
 #include <nstd/Error.hpp>
+#include <nstd/Time.hpp>
 
 ProxyLine::ProxyLine(Server& server, Server::Client& client, ICallback& callback, const Settings& settings)
     : _server(server)
@@ -12,6 +13,7 @@ ProxyLine::ProxyLine(Server& server, Server::Client& client, ICallback& callback
     , _handle(nullptr)
     , _port()
     , _connected(false)
+    , _lastReadActivity(0)
 {
     ;
 }
@@ -61,6 +63,7 @@ void ProxyLine::onRead()
             return;
         if (postponed)
             _handle->suspend();
+        _lastReadActivity = Time::time();
     }
     else
     {
@@ -79,6 +82,7 @@ void ProxyLine::onRead()
                 _proxyResponse = String();
                 _connected = true;
                 _callback.onOpened(*this);
+                _lastReadActivity = Time::time();
             }
             else
             {
@@ -100,4 +104,10 @@ void ProxyLine::onWrite()
 void ProxyLine::onClosed()
 {
     _callback.onClosed(*this, "Closed by proxy server");
+}
+
+String ProxyLine::getDebugInfo() const
+{
+    return String::fromPrintf("proxy=%s:%hu(%s), idle=%d", (const char*)Socket::inetNtoA(_settings.httpProxyAddr.addr), _settings.httpProxyAddr.port, 
+        _handle->isSuspended() ? "suspended" : "active", _lastReadActivity ? (int)((Time::time() - _lastReadActivity) / 1000) : -1);
 }
