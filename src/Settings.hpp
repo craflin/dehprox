@@ -10,6 +10,7 @@ struct Settings
 {
     Address httpProxyAddr;
     Address listenAddr;
+    Address debugListenAddr;
     Address dnsListenAddr;
     bool autoProxySkip;
     HashSet<String> whiteList;

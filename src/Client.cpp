@@ -8,6 +8,7 @@
 
 #include <nstd/Socket/Socket.hpp>
 #include <nstd/Log.hpp>
+#include <nstd/Time.hpp>
 
 #include "DnsDatabase.hpp"
 #include "DirectLine.hpp"
@@ -37,6 +38,7 @@ Client::Client(Server& server, Server::Client& client, const Address& clientAddr
     , _directLine(nullptr)
     , _activeLine(nullptr)
     , _address(clientAddr)
+    , _lastReadActivity(0)
 {
     ;
 }
@@ -128,6 +130,7 @@ void Client::onRead()
         return;
     if (postponed)
         _handle.suspend();
+    _lastReadActivity = Time::time();
 }
 
 void Client::onWrite()
@@ -183,4 +186,18 @@ void Client::close(const String& error)
         Log::infof("%s: Failed to establish connection with %s:%hu: %s", (const char*)Socket::inetNtoA(_address.addr),
         (const char*)_destinationHostname, _destination.port, (const char*)error);
     _callback.onClosed(*this);
+}
+
+String Client::getDebugInfo() const
+{
+    String result = String::fromPrintf("client=%s:%hu(%s), idle=%d, destination=%s:%hu", (const char*)Socket::inetNtoA(_address.addr), _address.port, 
+        _handle.isSuspended() ? "suspended" : "active", _lastReadActivity ? (int)((Time::time() - _lastReadActivity) / 1000) : -1,
+        (const char*)_destinationHostname, _destination.port);
+    if (_proxyLine && !_directLine)
+        result.append(String(", mode=proxy, ") + _proxyLine->getDebugInfo());
+    else if (_directLine && !_proxyLine)
+        result.append(String(", mode=direct"));
+    else
+        result.append(String(", mode=connecting"));
+    return result;
 }
