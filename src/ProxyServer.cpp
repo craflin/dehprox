@@ -65,16 +65,21 @@ void ProxyServer::DebugClient::onRead()
 
     String response;
     response.append("<html>\n");
+    response.append("<head><style>table, th, td { border: 1px solid black; border-collapse: collapse;}</style></head>\n");
     response.append("<body>\n");
     response.append("<p>\n");
+    response.append("<table>\n");
+
+    response.append("<tr><th>client</th><th>fd</th><th>poll</th><th>idle</th><th>sndbuf</th><th>destination</th><th>mode</th><th>sock</th><th>fd</th><th>poll</th><th>idle</th><th>sndbuf</th><th>proxy</th></tr>");
 
     for (PoolList<::Client>::Iterator i = _parent._parent._clients.begin(), end =_parent._parent._clients.end(); i != end; ++i)
     {
         const ::Client& client = *i;
         response.append(client.getDebugInfo());
-        response.append("<br/>");
+        response.append("\n");
     }
 
+    response.append("</table>\n");
     response.append("</p>\n");
     response.append("</body>\n");
     response.append("</html>\n");

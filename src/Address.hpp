@@ -8,5 +8,5 @@ struct Address
     uint32 addr;
     uint16 port;
 
-    Address() : addr(Socket::anyAddr), port(0) {}
+    Address() : addr(Socket::anyAddress), port(0) {}
 };

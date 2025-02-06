@@ -2,6 +2,7 @@
 #include "DirectLine.hpp"
 
 #include <nstd/Error.hpp>
+#include <nstd/Time.hpp>
 
 DirectLine::DirectLine(Server& server, Server::Client& client, ICallback& callback)
     : _server(server)
@@ -9,6 +10,7 @@ DirectLine::DirectLine(Server& server, Server::Client& client, ICallback& callba
     , _callback(callback)
     , _establisher(nullptr)
     , _handle(nullptr)
+    , _lastReadActivity(0)
 {
     ;
 }
@@ -53,6 +55,7 @@ void DirectLine::onRead()
         return;
     if (postponed)
         _handle->suspend();
+    _lastReadActivity = Time::time();
 }
 
 void DirectLine::onWrite()
@@ -63,4 +66,22 @@ void DirectLine::onWrite()
 void DirectLine::onClosed()
 {
     _callback.onClosed(*this, "Closed by peer");
+}
+
+String DirectLine::getDebugInfo() const
+{
+    if (!_handle)
+        return String("<td>connecting</td>");
+
+    uint32 ip = 0;
+    uint16 port = 0;
+    _handle->getSocket().getSockName(ip, port);
+
+    //<td>direct</td><td>0.0.0.0:828</td><td>78</td><td>active</td><td>8</td>
+    return String::fromPrintf("<td>direct</td><td>%s:%hu</td><td>%d</td><td>%s</td><td>%d</td><td>%d</td>",
+        (const char*)Socket::inetNtoA(ip), port,
+        (int)_handle->getSocket().getFileDescriptor(),
+        _handle->isSuspended() ? "suspended" : "active",
+        _lastReadActivity ? (int)((Time::time() - _lastReadActivity) / 1000) : -1,
+        (int)_handle->getSendBufferSize());
 }

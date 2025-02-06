@@ -7,7 +7,7 @@
 
 Settings::Settings() : autoProxySkip(true)
 {
-    httpProxyAddr.addr = Socket::loopbackAddr;
+    httpProxyAddr.addr = Socket::loopbackAddress;
     httpProxyAddr.port = 3128;
     listenAddr.port = 62124;
     dnsListenAddr.port = 62124;

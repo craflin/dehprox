@@ -190,14 +190,22 @@ void Client::close(const String& error)
 
 String Client::getDebugInfo() const
 {
-    String result = String::fromPrintf("client=%s:%hu(%s), idle=%d, destination=%s:%hu", (const char*)Socket::inetNtoA(_address.addr), _address.port, 
-        _handle.isSuspended() ? "suspended" : "active", _lastReadActivity ? (int)((Time::time() - _lastReadActivity) / 1000) : -1,
+    String result("<tr>");
+
+    //<td>192.168.0.196:56269</td><td>77</td><td>active</td><td>8</td><td>k8s.pforgeipt.intra.airbusds.corp:443</td>",
+    result += String::fromPrintf("<td>%s:%hu</td><td>%d</td><td>%s</td><td>%d</td><td>%d</td><td>%s:%hu</td>",
+        (const char*)Socket::inetNtoA(_address.addr), _address.port, (int)_handle.getSocket().getFileDescriptor(),
+        _handle.isSuspended() ? "suspended" : "active", _lastReadActivity ? (int)((Time::time() - _lastReadActivity) / 1000) : (int)-1,
+        (int)_handle.getSendBufferSize(),
         (const char*)_destinationHostname, _destination.port);
+
     if (_proxyLine && !_directLine)
-        result.append(String(", mode=proxy, ") + _proxyLine->getDebugInfo());
+        result.append(_proxyLine->getDebugInfo());
     else if (_directLine && !_proxyLine)
-        result.append(String(", mode=direct"));
+        result.append(_directLine->getDebugInfo());
     else
-        result.append(String(", mode=connecting"));
+        result.append(String("<td>connecting</td>"));
+
+    result.append("</tr>");
     return result;
 }
