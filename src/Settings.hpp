@@ -13,14 +13,15 @@ struct Settings
     Address listenAddr;
     Address debugListenAddr;
     Address dnsListenAddr;
-    bool autoProxySkip;
     HashSet<String> whiteList;
     HashSet<String> blackList;
     HashSet<String> skipProxyList;
 
+public:
     Settings();
 
     const Address& getProxyAddr(const String& destination) const;
+    bool isAutoProxySkipEnabled() const {return _autoProxySkip;}
 
     static bool isInList(const String& hostname, const HashSet<String>& list);
 
@@ -32,6 +33,7 @@ private:
 private:
     Array<Address> _httpProxyAddrs;
     DestinationHttpProxyAddrsMap _destinationHttpProxyAddrs;
+    bool _autoProxySkip;
 
 private:
     Settings(const Settings&);

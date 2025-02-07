@@ -6,7 +6,7 @@
 #include <nstd/Log.hpp>
 #include <nstd/Math.hpp>
 
-Settings::Settings() : autoProxySkip(true)
+Settings::Settings() : _autoProxySkip(true)
 {
     Address defaultHttpProxyAddr;
     defaultHttpProxyAddr.addr = Socket::loopbackAddress;
@@ -70,7 +70,7 @@ void Settings::loadSettings(const String& file, Settings& settings)
         else if (option == "dnsListenAddr")
             settings.dnsListenAddr.addr = Socket::inetAddr(value, &settings.dnsListenAddr.port);
         else if (option == "autoProxySkip")
-            settings.autoProxySkip = value.toBool();
+            settings._autoProxySkip = value.toBool();
         else if (option == "allowDest")
             settings.whiteList.append(value);
         else if (option == "denyDest")
