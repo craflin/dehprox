@@ -108,6 +108,19 @@ void ProxyLine::onClosed()
 
 String ProxyLine::getDebugInfo() const
 {
-    return String::fromPrintf("proxy=%s:%hu(%s), idle=%d", (const char*)Socket::inetNtoA(_settings.httpProxyAddr.addr), _settings.httpProxyAddr.port, 
-        _handle->isSuspended() ? "suspended" : "active", _lastReadActivity ? (int)((Time::time() - _lastReadActivity) / 1000) : -1);
+    if (!_handle)
+        return String("<td>connecting</td>");
+
+    uint32 ip = 0;
+    uint16 port = 0;
+    _handle->getSocket().getSockName(ip, port);
+
+    //<td>proxy</td><td>0.0.0.0:828</td><td>78</td><td>active</td><td>8</td><td>10.43.214.107:8080</td>
+    return String::fromPrintf("<td>proxy</td><td>%s:%hu</td><td>%d</td><td>%s</td><td>%d</td><td>%d</td><td>%s:%hu</td>",
+        (const char*)Socket::inetNtoA(ip), port,
+        (int)_handle->getSocket().getFileDescriptor(),
+        _handle->isSuspended() ? "suspended" : "active",
+        _lastReadActivity ? (int)((Time::time() - _lastReadActivity) / 1000) : -1,
+        (int)_handle->getSendBufferSize(),
+        (const char*)Socket::inetNtoA(_settings.httpProxyAddr.addr), _settings.httpProxyAddr.port);
 }

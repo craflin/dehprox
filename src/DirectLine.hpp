@@ -27,6 +27,8 @@ public:
 
     bool connect(const Address& address);
 
+    String getDebugInfo() const;
+
 public: // Server::Establisher::ICallback
     Server::Client::ICallback *onConnected(Server::Client &client) override;
     void onAbolished() override;
@@ -42,4 +44,5 @@ private:
     ICallback& _callback;
     Server::Establisher* _establisher;
     Server::Client* _handle;
+    int64 _lastReadActivity;
 };
