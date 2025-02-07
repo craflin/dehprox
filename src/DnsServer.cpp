@@ -153,7 +153,7 @@ uint DnsServer::run()
                     goto ignoreRequest;
 
                 const char* rejectReason = nullptr;
-                if (!_settings.whiteList.isEmpty() && !Settings::isInList(hostname, _settings.whiteList))
+                if (!_settings.isWhiteListEmpty() && !_settings.isInWhiteList(hostname))
                     rejectReason = "Not listed in white list";
                 else if (Settings::isInList(hostname, _settings.blackList))
                     rejectReason = "Listed in black list";

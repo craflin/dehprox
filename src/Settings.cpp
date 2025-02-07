@@ -72,7 +72,7 @@ void Settings::loadSettings(const String& file)
         else if (option == "autoProxySkip")
             _autoProxySkip = value.toBool();
         else if (option == "allowDest")
-            whiteList.append(value);
+            _whiteList.append(value);
         else if (option == "denyDest")
             blackList.append(value);
         else if (option == "skipProxyDest")
@@ -81,6 +81,34 @@ void Settings::loadSettings(const String& file)
             Log::warningf("Unknown option: %s", (const char*)option);
     }
 }
+
+namespace {
+    bool isInList(const String& hostname_, const HashSet<String>& list)
+    {
+        if (list.contains(hostname_))
+            return true;
+        const char* x = hostname_.find('.');
+        if (!x)
+            return false;
+        String hostname = hostname_.substr(x - (const char*)hostname_ + 1);
+        for (;;)
+        {
+            if (list.contains(hostname))
+                return true;
+            const char* x = hostname.find('.');
+            if (!x)
+                return false;
+            hostname = hostname.substr(x - (const char*)hostname + 1);
+        }
+    }
+}
+
+bool Settings::isInWhiteList(const String& destination) const
+{
+    return ::isInList(destination, _whiteList);
+}
+
+
 
 bool Settings::isInList(const String& hostname_, const HashSet<String>& list)
 {

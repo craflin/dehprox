@@ -10,22 +10,25 @@
 
 struct Settings
 {
-    HashSet<String> whiteList;
     HashSet<String> blackList;
     HashSet<String> skipProxyList;
 
 public:
     Settings();
 
+    void loadSettings(const String& file);
+
     const Address& getListenAddr() const {return _listenAddr;}
     const Address& getDebugListenAddr() const {return _debugListenAddr;}
     const Address& getDnsListenAddr() const {return _dnsListenAddr;}
     const Address& getProxyAddr(const String& destination) const;
     bool isAutoProxySkipEnabled() const {return _autoProxySkip;}
+    bool isWhiteListEmpty() const {return _whiteList.isEmpty();}
+    bool isInWhiteList(const String& destination) const;
 
     static bool isInList(const String& hostname, const HashSet<String>& list);
 
-    void loadSettings(const String& file);
+    
 
 private:
     typedef HashMap<String, Array<Address>> DestinationHttpProxyAddrsMap;
@@ -37,6 +40,7 @@ private:
     Array<Address> _httpProxyAddrs;
     DestinationHttpProxyAddrsMap _destinationHttpProxyAddrs;
     bool _autoProxySkip;
+    HashSet<String> _whiteList;
 
 private:
     Settings(const Settings&);
