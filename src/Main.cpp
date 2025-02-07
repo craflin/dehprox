@@ -55,7 +55,7 @@ int main(int argc, char* argv[])
 
     // load settings
     Settings settings;
-    Settings::loadSettings(configFile, settings);
+    settings.loadSettings(configFile);
 
     // daemonize process
 #ifndef _WIN32

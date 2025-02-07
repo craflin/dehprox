@@ -17,7 +17,7 @@ Settings::Settings() : _autoProxySkip(true)
     dnsListenAddr.port = 62124;
 }
 
-void Settings::loadSettings(const String& file, Settings& settings)
+void Settings::loadSettings(const String& file)
 {
     String conf;
     if (!File::readAll(file, conf))
@@ -45,7 +45,7 @@ void Settings::loadSettings(const String& file, Settings& settings)
             if (!httpProxyAddrsSet)
             {
                 httpProxyAddrsSet = true;
-                settings._httpProxyAddrs.clear();
+                _httpProxyAddrs.clear();
             }
 
             Address addr;
@@ -55,28 +55,28 @@ void Settings::loadSettings(const String& file, Settings& settings)
             {
                 const String& destination = *(++(++tokens.begin()));
 
-                DestinationHttpProxyAddrsMap::Iterator it = settings._destinationHttpProxyAddrs.find(destination);
-                if (it == settings._destinationHttpProxyAddrs.end())
-                    it = settings._destinationHttpProxyAddrs.insert(settings._destinationHttpProxyAddrs.end(), destination, Array<Address>());
+                DestinationHttpProxyAddrsMap::Iterator it = _destinationHttpProxyAddrs.find(destination);
+                if (it == _destinationHttpProxyAddrs.end())
+                    it = _destinationHttpProxyAddrs.insert(_destinationHttpProxyAddrs.end(), destination, Array<Address>());
                 it->append(addr);
             }
             else
-                settings._httpProxyAddrs.append(addr);
+                _httpProxyAddrs.append(addr);
         }
         else if (option == "listenAddr")
-            settings.listenAddr.addr = Socket::inetAddr(value, &settings.listenAddr.port);
+            listenAddr.addr = Socket::inetAddr(value, &listenAddr.port);
         else if (option == "debugListenAddr")
-            settings.debugListenAddr.addr = Socket::inetAddr(value, &settings.debugListenAddr.port);
+            debugListenAddr.addr = Socket::inetAddr(value, &debugListenAddr.port);
         else if (option == "dnsListenAddr")
-            settings.dnsListenAddr.addr = Socket::inetAddr(value, &settings.dnsListenAddr.port);
+            dnsListenAddr.addr = Socket::inetAddr(value, &dnsListenAddr.port);
         else if (option == "autoProxySkip")
-            settings._autoProxySkip = value.toBool();
+            _autoProxySkip = value.toBool();
         else if (option == "allowDest")
-            settings.whiteList.append(value);
+            whiteList.append(value);
         else if (option == "denyDest")
-            settings.blackList.append(value);
+            blackList.append(value);
         else if (option == "skipProxyDest")
-            settings.skipProxyList.append(value);
+            skipProxyList.append(value);
         else
             Log::warningf("Unknown option: %s", (const char*)option);
     }

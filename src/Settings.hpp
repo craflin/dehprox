@@ -25,7 +25,7 @@ public:
 
     static bool isInList(const String& hostname, const HashSet<String>& list);
 
-    static void loadSettings(const String& file, Settings& settings);
+    void loadSettings(const String& file);
 
 private:
     typedef HashMap<String, Array<Address>> DestinationHttpProxyAddrsMap;
