@@ -10,7 +10,6 @@
 
 struct Settings
 {
-    Address debugListenAddr;
     Address dnsListenAddr;
     HashSet<String> whiteList;
     HashSet<String> blackList;
@@ -20,6 +19,7 @@ public:
     Settings();
 
     const Address& getListenAddr() const {return _listenAddr;}
+    const Address& getDebugListenAddr() const {return _debugListenAddr;}
     const Address& getProxyAddr(const String& destination) const;
     bool isAutoProxySkipEnabled() const {return _autoProxySkip;}
 
@@ -32,6 +32,7 @@ private:
 
 private:
     Address _listenAddr;
+    Address _debugListenAddr;
     Array<Address> _httpProxyAddrs;
     DestinationHttpProxyAddrsMap _destinationHttpProxyAddrs;
     bool _autoProxySkip;

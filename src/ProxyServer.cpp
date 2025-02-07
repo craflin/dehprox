@@ -21,8 +21,9 @@ bool ProxyServer::start()
 
 bool ProxyServer::startDebugPort()
 {
-    if (_settings.debugListenAddr.port)
-        if (!_server.listen(_settings.debugListenAddr.addr, _settings.debugListenAddr.port, _debugListener))
+    const Address& debugListenAddr = _settings.getDebugListenAddr();
+    if (debugListenAddr.port)
+        if (!_server.listen(debugListenAddr.addr, debugListenAddr.port, _debugListener))
             return false;
     return true;
 }

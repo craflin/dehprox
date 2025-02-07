@@ -66,7 +66,7 @@ void Settings::loadSettings(const String& file)
         else if (option == "listenAddr")
             _listenAddr.addr = Socket::inetAddr(value, &_listenAddr.port);
         else if (option == "debugListenAddr")
-            debugListenAddr.addr = Socket::inetAddr(value, &debugListenAddr.port);
+            _debugListenAddr.addr = Socket::inetAddr(value, &_debugListenAddr.port);
         else if (option == "dnsListenAddr")
             dnsListenAddr.addr = Socket::inetAddr(value, &dnsListenAddr.port);
         else if (option == "autoProxySkip")

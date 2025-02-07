@@ -83,16 +83,18 @@ int main(int argc, char* argv[])
 
     // start transparent proxy server
     ProxyServer proxyServer(settings);
+    const Address& listenAddr = settings.getListenAddr();
     if (!proxyServer.start())
-        return Log::errorf("Could not start proxy server on TCP port %s:%hu: %s", (const char*)Socket::inetNtoA(settings.getListenAddr().addr), (uint16)settings.getListenAddr().port, (const char*)Socket::getErrorString()), 1;
-    Log::infof("Listening on TCP port %hu...", (uint16)settings.getListenAddr().port);
+        return Log::errorf("Could not start proxy server on TCP port %s:%hu: %s", (const char*)Socket::inetNtoA(listenAddr.addr), (uint16)listenAddr.port, (const char*)Socket::getErrorString()), 1;
+    Log::infof("Listening on TCP port %hu...", (uint16)listenAddr.port);
 
     // start listening for debug connections
-    if (settings.debugListenAddr.port)
+    const Address& debugListenAddr = settings.getDebugListenAddr();
+    if (debugListenAddr.port)
     {
         if (!proxyServer.startDebugPort())
-            return Log::errorf("Could not start proxy server on debug TCP port %s:%hu: %s", (const char*)Socket::inetNtoA(settings.debugListenAddr.addr), (uint16)settings.debugListenAddr.port, (const char*)Socket::getErrorString()), 1;
-        Log::infof("Listening on debug TCP port %hu...", (uint16)settings.debugListenAddr.port);
+            return Log::errorf("Could not start proxy server on debug TCP port %s:%hu: %s", (const char*)Socket::inetNtoA(debugListenAddr.addr), (uint16)debugListenAddr.port, (const char*)Socket::getErrorString()), 1;
+        Log::infof("Listening on debug TCP port %hu...", (uint16)debugListenAddr.port);
     }
 
     // run dns server
