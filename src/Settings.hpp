@@ -10,7 +10,6 @@
 
 struct Settings
 {
-    Array<Address> httpProxyAddrs;
     Address listenAddr;
     Address debugListenAddr;
     Address dnsListenAddr;
@@ -31,6 +30,7 @@ private:
     typedef HashMap<String, Array<Address>> DestinationHttpProxyAddrsMap;
 
 private:
+    Array<Address> _httpProxyAddrs;
     DestinationHttpProxyAddrsMap _destinationHttpProxyAddrs;
 
 private:

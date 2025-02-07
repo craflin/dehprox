@@ -11,7 +11,7 @@ Settings::Settings() : autoProxySkip(true)
     Address defaultHttpProxyAddr;
     defaultHttpProxyAddr.addr = Socket::loopbackAddress;
     defaultHttpProxyAddr.port = 3128;
-    httpProxyAddrs.append(defaultHttpProxyAddr);
+    _httpProxyAddrs.append(defaultHttpProxyAddr);
 
     listenAddr.port = 62124;
     dnsListenAddr.port = 62124;
@@ -45,7 +45,7 @@ void Settings::loadSettings(const String& file, Settings& settings)
             if (!httpProxyAddrsSet)
             {
                 httpProxyAddrsSet = true;
-                settings.httpProxyAddrs.clear();
+                settings._httpProxyAddrs.clear();
             }
 
             Address addr;
@@ -61,7 +61,7 @@ void Settings::loadSettings(const String& file, Settings& settings)
                 it->append(addr);
             }
             else
-                settings.httpProxyAddrs.append(addr);
+                settings._httpProxyAddrs.append(addr);
         }
         else if (option == "listenAddr")
             settings.listenAddr.addr = Socket::inetAddr(value, &settings.listenAddr.port);
@@ -127,5 +127,5 @@ const Address& Settings::getProxyAddr(const String& destination_) const
             destination = destination.substr(x - (const char*)destination + 1);
         }
     }
-    return getRandomProxyAddr(httpProxyAddrs);
+    return getRandomProxyAddr(_httpProxyAddrs);
 }
