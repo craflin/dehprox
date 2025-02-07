@@ -4,6 +4,7 @@
 #include <nstd/File.hpp>
 #include <nstd/List.hpp>
 #include <nstd/Log.hpp>
+#include <nstd/Math.hpp>
 
 Settings::Settings() : autoProxySkip(true)
 {
@@ -49,7 +50,18 @@ void Settings::loadSettings(const String& file, Settings& settings)
 
             Address addr;
             addr.addr = Socket::inetAddr(value, &addr.port);
-            settings.httpProxyAddrs.append(addr);
+
+            if (tokens.size() > 2)
+            {
+                const String& destination = *(++(++tokens.begin()));
+
+                DestinationHttpProxyAddrsMap::Iterator it = settings._destinationHttpProxyAddrs.find(destination);
+                if (it == settings._destinationHttpProxyAddrs.end())
+                    it = settings._destinationHttpProxyAddrs.insert(settings._destinationHttpProxyAddrs.end(), destination, Array<Address>());
+                it->append(addr);
+            }
+            else
+                settings.httpProxyAddrs.append(addr);
         }
         else if (option == "listenAddr")
             settings.listenAddr.addr = Socket::inetAddr(value, &settings.listenAddr.port);
@@ -87,4 +99,33 @@ bool Settings::isInList(const String& hostname_, const HashSet<String>& list)
             return false;
         hostname = hostname.substr(x - (const char*)hostname + 1);
     }
+}
+
+namespace {
+    const Address& getRandomProxyAddr(const Array<Address>& addrs)
+    {
+        return addrs[Math::random() % addrs.size()];
+    }
+}
+
+const Address& Settings::getProxyAddr(const String& destination_) const
+{
+    DestinationHttpProxyAddrsMap::Iterator it = _destinationHttpProxyAddrs.find(destination_);
+    if (it != _destinationHttpProxyAddrs.end())
+        return getRandomProxyAddr(*it);
+    if (const char* x = destination_.find('.'))
+    {
+        String destination = destination_.substr(x - (const char*)destination_ + 1);
+        for (;;)
+        {
+            it = _destinationHttpProxyAddrs.find(destination_);
+            if (it != _destinationHttpProxyAddrs.end())
+                return getRandomProxyAddr(*it);
+            const char* x = destination.find('.');
+            if (!x)
+                break;
+            destination = destination.substr(x - (const char*)destination + 1);
+        }
+    }
+    return getRandomProxyAddr(httpProxyAddrs);
 }

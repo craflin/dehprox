@@ -21,7 +21,7 @@ public:
     };
 
 public:
-    ProxyLine(Server& server, Server::Client& client, ICallback& callback, const Address& httpProxyAddr);
+    ProxyLine(Server& server, Server::Client& client, ICallback& callback, const Settings& settings);
     ~ProxyLine();
 
     Server::Client* getHandle() {return _handle;}
@@ -43,11 +43,12 @@ private:
     Server& _server;
     Server::Client& _client;
     ICallback& _callback;
-    const Address& _httpProxyAddr;
+    const Settings& _settings;
     Server::Establisher* _establisher;
     Server::Client* _handle;
     String _hostname;
     uint16 _port;
+    Address _httpProxyAddr;
     bool _connected;
     String _proxyResponse;
     int64 _lastReadActivity;

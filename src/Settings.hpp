@@ -1,9 +1,10 @@
 
 #pragma once
 
-#include <nstd/String.hpp>
-#include <nstd/HashSet.hpp>
 #include <nstd/Array.hpp>
+#include <nstd/HashMap.hpp>
+#include <nstd/HashSet.hpp>
+#include <nstd/String.hpp>
 
 #include "Address.hpp"
 
@@ -20,8 +21,19 @@ struct Settings
 
     Settings();
 
+    const Address& getProxyAddr(const String& destination) const;
+
     static bool isInList(const String& hostname, const HashSet<String>& list);
 
     static void loadSettings(const String& file, Settings& settings);
-};
 
+private:
+    typedef HashMap<String, Array<Address>> DestinationHttpProxyAddrsMap;
+
+private:
+    DestinationHttpProxyAddrsMap _destinationHttpProxyAddrs;
+
+private:
+    Settings(const Settings&);
+    Settings& operator=(const Settings&);
+};
