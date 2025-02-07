@@ -13,7 +13,7 @@ Settings::Settings() : _autoProxySkip(true)
     defaultHttpProxyAddr.port = 3128;
     _httpProxyAddrs.append(defaultHttpProxyAddr);
 
-    listenAddr.port = 62124;
+    _listenAddr.port = 62124;
     dnsListenAddr.port = 62124;
 }
 
@@ -64,7 +64,7 @@ void Settings::loadSettings(const String& file)
                 _httpProxyAddrs.append(addr);
         }
         else if (option == "listenAddr")
-            listenAddr.addr = Socket::inetAddr(value, &listenAddr.port);
+            _listenAddr.addr = Socket::inetAddr(value, &_listenAddr.port);
         else if (option == "debugListenAddr")
             debugListenAddr.addr = Socket::inetAddr(value, &debugListenAddr.port);
         else if (option == "dnsListenAddr")

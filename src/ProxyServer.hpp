@@ -14,7 +14,7 @@ public:
     ProxyServer(const Settings& settings);
 
     bool start();
-    bool startDebug();
+    bool startDebugPort();
 
     void run();
 

@@ -12,13 +12,14 @@ ProxyServer::ProxyServer(const Settings& settings) : _settings(settings) , _debu
 
 bool ProxyServer::start()
 {
-    if (!_server.listen(_settings.listenAddr.addr, _settings.listenAddr.port, *this))
+    const Address& listenAddr = _settings.getListenAddr();
+    if (!_server.listen(listenAddr.addr, listenAddr.port, *this))
         return false;
     return true;
 }
 
 
-bool ProxyServer::startDebug()
+bool ProxyServer::startDebugPort()
 {
     if (_settings.debugListenAddr.port)
         if (!_server.listen(_settings.debugListenAddr.addr, _settings.debugListenAddr.port, _debugListener))
