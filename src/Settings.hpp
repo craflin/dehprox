@@ -10,7 +10,6 @@
 
 struct Settings
 {
-    HashSet<String> blackList;
     HashSet<String> skipProxyList;
 
 public:
@@ -25,10 +24,9 @@ public:
     bool isAutoProxySkipEnabled() const {return _autoProxySkip;}
     bool isWhiteListEmpty() const {return _whiteList.isEmpty();}
     bool isInWhiteList(const String& destination) const;
+    bool isInBlackList(const String& destination) const;
 
     static bool isInList(const String& hostname, const HashSet<String>& list);
-
-    
 
 private:
     typedef HashMap<String, Array<Address>> DestinationHttpProxyAddrsMap;
@@ -41,6 +39,7 @@ private:
     DestinationHttpProxyAddrsMap _destinationHttpProxyAddrs;
     bool _autoProxySkip;
     HashSet<String> _whiteList;
+    HashSet<String> _blackList;
 
 private:
     Settings(const Settings&);

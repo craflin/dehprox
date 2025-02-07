@@ -81,7 +81,7 @@ bool Client::init()
     {
         if (!_settings.isWhiteListEmpty() && !_settings.isInWhiteList(_destinationHostname))
             rejectReason = "Not listed in white list";
-        else if (Settings::isInList(_destinationHostname, _settings.blackList))
+        else if (_settings.isInBlackList(_destinationHostname))
             rejectReason = "Listed in black list";
     }
 

@@ -74,7 +74,7 @@ void Settings::loadSettings(const String& file)
         else if (option == "allowDest")
             _whiteList.append(value);
         else if (option == "denyDest")
-            blackList.append(value);
+            _blackList.append(value);
         else if (option == "skipProxyDest")
             skipProxyList.append(value);
         else
@@ -108,7 +108,10 @@ bool Settings::isInWhiteList(const String& destination) const
     return ::isInList(destination, _whiteList);
 }
 
-
+bool Settings::isInBlackList(const String& destination) const
+{
+    return ::isInList(destination, _blackList);
+}
 
 bool Settings::isInList(const String& hostname_, const HashSet<String>& list)
 {
