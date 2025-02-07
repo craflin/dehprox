@@ -76,7 +76,7 @@ void Settings::loadSettings(const String& file)
         else if (option == "denyDest")
             _blackList.append(value);
         else if (option == "skipProxyDest")
-            skipProxyList.append(value);
+            _skipProxyList.append(value);
         else
             Log::warningf("Unknown option: %s", (const char*)option);
     }
@@ -113,23 +113,9 @@ bool Settings::isInBlackList(const String& destination) const
     return ::isInList(destination, _blackList);
 }
 
-bool Settings::isInList(const String& hostname_, const HashSet<String>& list)
+bool Settings::isInSkipProxyList(const String& destination) const
 {
-    if (list.contains(hostname_))
-        return true;
-    const char* x = hostname_.find('.');
-    if (!x)
-        return false;
-    String hostname = hostname_.substr(x - (const char*)hostname_ + 1);
-    for (;;)
-    {
-        if (list.contains(hostname))
-            return true;
-        const char* x = hostname.find('.');
-        if (!x)
-            return false;
-        hostname = hostname.substr(x - (const char*)hostname + 1);
-    }
+    return ::isInList(destination, _skipProxyList);
 }
 
 namespace {
