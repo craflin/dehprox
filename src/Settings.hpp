@@ -11,14 +11,12 @@
 struct Settings
 {
 public:
-    Settings();
-
-    void loadSettings(const String& file);
+    Settings(const String& file);
 
     const Address& getListenAddr() const {return _listenAddr;}
     const Address& getDebugListenAddr() const {return _debugListenAddr;}
     const Address& getDnsListenAddr() const {return _dnsListenAddr;}
-    const Address& getProxyAddr(const String& destination) const;
+    const Address& getProxyAddr(const String& destination);
     bool isAutoProxySkipEnabled() const {return _autoProxySkip;}
     bool isWhiteListEmpty() const {return _whiteList.isEmpty();}
     bool isInWhiteList(const String& destination) const;

@@ -11,7 +11,7 @@ class ProxyServer : public Server::Listener::ICallback
     , public Client::ICallback
 {
 public:
-    ProxyServer(const Settings& settings);
+    ProxyServer(Settings& settings);
 
     bool start();
     bool startDebugPort();
@@ -58,7 +58,7 @@ private:
     };
 
 private:
-    const Settings& _settings;
+    Settings& _settings;
     Server _server;
     PoolList<::Client> _clients;
     DebugListener _debugListener;

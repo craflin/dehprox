@@ -6,7 +6,7 @@
 #include <nstd/Log.hpp>
 #include <nstd/Math.hpp>
 
-Settings::Settings() : _autoProxySkip(true)
+Settings::Settings(const String& file) : _autoProxySkip(true)
 {
     Address defaultHttpProxyAddr;
     defaultHttpProxyAddr.addr = Socket::loopbackAddress;
@@ -15,10 +15,7 @@ Settings::Settings() : _autoProxySkip(true)
 
     _listenAddr.port = 62124;
     _dnsListenAddr.port = 62124;
-}
 
-void Settings::loadSettings(const String& file)
-{
     String conf;
     if (!File::readAll(file, conf))
         return;
@@ -125,7 +122,7 @@ namespace {
     }
 }
 
-const Address& Settings::getProxyAddr(const String& destination_) const
+const Address& Settings::getProxyAddr(const String& destination_)
 {
     DestinationHttpProxyAddrsMap::Iterator it = _destinationHttpProxyAddrs.find(destination_);
     if (it != _destinationHttpProxyAddrs.end())

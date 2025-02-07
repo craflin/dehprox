@@ -54,8 +54,7 @@ int main(int argc, char* argv[])
     Log::setLevel(Log::debug);
 
     // load settings
-    Settings settings;
-    settings.loadSettings(configFile);
+    Settings settings(configFile);
 
     // daemonize process
 #ifndef _WIN32

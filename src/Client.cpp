@@ -29,7 +29,7 @@ bool getOriginalDst(Socket& s, uint32& addr, uint16& port)
 #endif
 }
 
-Client::Client(Server& server, Server::Client& client, const Address& clientAddr, ICallback& callback, const Settings& settings)
+Client::Client(Server& server, Server::Client& client, const Address& clientAddr, ICallback& callback, Settings& settings)
     : _server(server)
     , _handle(client)
     , _callback(callback)

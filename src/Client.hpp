@@ -23,7 +23,7 @@ public:
     };
 
 public:
-    Client(Server& server, Server::Client& client, const Address& clientAddr, ICallback& callback, const Settings& settings);
+    Client(Server& server, Server::Client& client, const Address& clientAddr, ICallback& callback, Settings& settings);
     ~Client();
 
     bool init();
@@ -47,7 +47,7 @@ private:
     Server& _server;
     Server::Client& _handle;
     ICallback& _callback;
-    const Settings& _settings;
+    Settings& _settings;
     ProxyLine* _proxyLine;
     DirectLine* _directLine;
     Server::Client* _activeLine;

@@ -4,7 +4,7 @@
 #include <nstd/Error.hpp>
 #include <nstd/Time.hpp>
 
-ProxyLine::ProxyLine(Server& server, Server::Client& client, ICallback& callback, const Settings& settings)
+ProxyLine::ProxyLine(Server& server, Server::Client& client, ICallback& callback, Settings& settings)
     : _server(server)
     , _client(client)
     , _callback(callback)
