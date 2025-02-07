@@ -4,11 +4,11 @@
 #include <nstd/Error.hpp>
 #include <nstd/Time.hpp>
 
-ProxyLine::ProxyLine(Server& server, Server::Client& client, ICallback& callback, const Settings& settings)
+ProxyLine::ProxyLine(Server& server, Server::Client& client, ICallback& callback, const Address& httpProxyAddr)
     : _server(server)
     , _client(client)
     , _callback(callback)
-    , _settings(settings)
+    , _httpProxyAddr(httpProxyAddr)
     , _establisher(nullptr)
     , _handle(nullptr)
     , _port()
@@ -30,7 +30,7 @@ bool ProxyLine::connect(const String& hostname, int16 port)
 {
     _hostname = hostname;
     _port = port;
-    _establisher = _server.connect(_settings.httpProxyAddr.addr, _settings.httpProxyAddr.port, *this);
+    _establisher = _server.connect(_httpProxyAddr.addr, _httpProxyAddr.port, *this);
     if (!_establisher)
         return false;
     return true;
@@ -122,5 +122,5 @@ String ProxyLine::getDebugInfo() const
         _handle->isSuspended() ? "suspended" : "active",
         _lastReadActivity ? (int)((Time::time() - _lastReadActivity) / 1000) : -1,
         (int)_handle->getSendBufferSize(),
-        (const char*)Socket::inetNtoA(_settings.httpProxyAddr.addr), _settings.httpProxyAddr.port);
+        (const char*)Socket::inetNtoA(_httpProxyAddr.addr), _httpProxyAddr.port);
 }

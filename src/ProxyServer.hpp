@@ -62,4 +62,8 @@ private:
     Server _server;
     PoolList<::Client> _clients;
     DebugListener _debugListener;
+    usize _lastProxyAddrIndex;
+
+private:
+    const Address& getNextHttpProxyAddr();
 };

@@ -29,11 +29,12 @@ bool getOriginalDst(Socket& s, uint32& addr, uint16& port)
 #endif
 }
 
-Client::Client(Server& server, Server::Client& client, const Address& clientAddr, ICallback& callback, const Settings& settings)
+Client::Client(Server& server, Server::Client& client, const Address& clientAddr, ICallback& callback, const Settings& settings, const Address& httpProxyAddr)
     : _server(server)
     , _handle(client)
     , _callback(callback)
     , _settings(settings)
+    , _httpProxyAddr(httpProxyAddr)
     , _proxyLine(nullptr)
     , _directLine(nullptr)
     , _activeLine(nullptr)
@@ -110,7 +111,7 @@ bool Client::init()
 
     if (proxyConnect)
     {
-        _proxyLine = new ProxyLine(_server, _handle, *this, _settings);
+        _proxyLine = new ProxyLine(_server, _handle, *this, _httpProxyAddr);
         if (!_proxyLine->connect(_destinationHostname, _destination.port))
             return false;
     }

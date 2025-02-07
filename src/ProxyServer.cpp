@@ -3,7 +3,7 @@
 
 #include <nstd/Error.hpp>
 
-ProxyServer::ProxyServer(const Settings& settings) : _settings(settings) , _debugListener(*this)
+ProxyServer::ProxyServer(const Settings& settings) : _settings(settings) , _debugListener(*this), _lastProxyAddrIndex((usize)-1)
 {
     _server.setReuseAddress(true);
     _server.setKeepAlive(true);
@@ -31,13 +31,21 @@ void ProxyServer::run()
     _server.run();
 }
 
+const Address& ProxyServer::getNextHttpProxyAddr()
+{
+    ++_lastProxyAddrIndex;
+    if (_lastProxyAddrIndex >= _settings.httpProxyAddrs.size())
+        _lastProxyAddrIndex = 0;
+    return _settings.httpProxyAddrs[_lastProxyAddrIndex];
+}
+
 Server::Client::ICallback *ProxyServer::onAccepted(Server::Client &client_, uint32 ip, uint16 port)
 {
     Address address;
     address.addr = ip;
     address.port = port;
 
-    ::Client& client = _clients.append<Server&, Server::Client&, const Address&, Client::ICallback&, const Settings&>(_server, client_, address, *this, _settings);
+    ::Client& client = _clients.append<Server&, Server::Client&, const Address&, Client::ICallback&, const Settings&, const Address&>(_server, client_, address, *this, _settings, getNextHttpProxyAddr());
     if (!client.init())
     {
         _clients.remove(client);

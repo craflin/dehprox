@@ -7,8 +7,11 @@
 
 Settings::Settings() : autoProxySkip(true)
 {
-    httpProxyAddr.addr = Socket::loopbackAddress;
-    httpProxyAddr.port = 3128;
+    Address defaultHttpProxyAddr;
+    defaultHttpProxyAddr.addr = Socket::loopbackAddress;
+    defaultHttpProxyAddr.port = 3128;
+    httpProxyAddrs.append(defaultHttpProxyAddr);
+
     listenAddr.port = 62124;
     dnsListenAddr.port = 62124;
 }
@@ -20,6 +23,7 @@ void Settings::loadSettings(const String& file, Settings& settings)
         return;
     List<String> lines;
     conf.split(lines, "\n\r");
+    bool httpProxyAddrsSet = false;
     for (List<String>::Iterator i = lines.begin(), end = lines.end(); i != end; ++i)
     {
         String line = *i;
@@ -36,7 +40,17 @@ void Settings::loadSettings(const String& file, Settings& settings)
         const String& option = *tokens.begin();
         const String& value = *(++tokens.begin());
         if (option == "httpProxyAddr")
-            settings.httpProxyAddr.addr = Socket::inetAddr(value, &settings.httpProxyAddr.port);
+        {
+            if (!httpProxyAddrsSet)
+            {
+                httpProxyAddrsSet = true;
+                settings.httpProxyAddrs.clear();
+            }
+
+            Address addr;
+            addr.addr = Socket::inetAddr(value, &addr.port);
+            settings.httpProxyAddrs.append(addr);
+        }
         else if (option == "listenAddr")
             settings.listenAddr.addr = Socket::inetAddr(value, &settings.listenAddr.port);
         else if (option == "debugListenAddr")

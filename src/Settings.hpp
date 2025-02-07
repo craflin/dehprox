@@ -3,12 +3,13 @@
 
 #include <nstd/String.hpp>
 #include <nstd/HashSet.hpp>
+#include <nstd/Array.hpp>
 
 #include "Address.hpp"
 
 struct Settings
 {
-    Address httpProxyAddr;
+    Array<Address> httpProxyAddrs;
     Address listenAddr;
     Address debugListenAddr;
     Address dnsListenAddr;
