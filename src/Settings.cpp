@@ -159,7 +159,7 @@ const Address& Settings::getProxyAddr(const String& destination_)
         String destination = destination_.substr(x - (const char*)destination_ + 1);
         for (;;)
         {
-            it = _destinationHttpProxyAddrs.find(destination_);
+            it = _destinationHttpProxyAddrs.find(destination);
             if (it != _destinationHttpProxyAddrs.end())
                 return getRandomProxyAddr(*it);
             const char* x = destination.find('.');
