@@ -21,7 +21,7 @@ If your network is not that restricted, you should probably look at other TCP to
 ## Motivation
 
 In some cases, it is very time consuming to configure your system and your tools (that may ignore your system settings) to use a HTTP proxy and some tools might not support proxy servers at all.
-Hence, it might be a good idea to set up a little router that allows you to use your network like a network without the a proxy.
+Hence, it might be a good idea to set up a little router that allows you to use your network like a network without a proxy.
 
 ## Build Instructions
 
