@@ -29,7 +29,7 @@ bool getOriginalDst(Socket& s, uint32& addr, uint16& port)
 #endif
 }
 
-Client::Client(Server& server, Server::Client& client, const Address& clientAddr, ICallback& callback, const Settings& settings)
+Client::Client(Server& server, Server::Client& client, const Address& clientAddr, ICallback& callback, Settings& settings)
     : _server(server)
     , _handle(client)
     , _callback(callback)
@@ -65,13 +65,13 @@ bool Client::init()
         proxyConnect = true;
     else if (DnsDatabase::reverseResolve(_destination.addr, _destinationHostname))
     {
-        directConnect = _settings.autoProxySkip;
+        directConnect = _settings.isAutoProxySkipEnabled();
         proxyConnect = true;
     }
     else if (!DnsDatabase::isFake(_destination.addr))
     {
         _destinationHostname = Socket::inetNtoA(_destination.addr);
-        directConnect = _settings.autoProxySkip;
+        directConnect = _settings.isAutoProxySkipEnabled();
         proxyConnect = true;
     }
     else
@@ -79,9 +79,9 @@ bool Client::init()
 
     if (!rejectReason)
     {
-        if (!_settings.whiteList.isEmpty() && !Settings::isInList(_destinationHostname, _settings.whiteList))
+        if (!_settings.isWhiteListEmpty() && !_settings.isInWhiteList(_destinationHostname))
             rejectReason = "Not listed in white list";
-        else if (Settings::isInList(_destinationHostname, _settings.blackList))
+        else if (_settings.isInBlackList(_destinationHostname))
             rejectReason = "Listed in black list";
     }
 
@@ -92,7 +92,7 @@ bool Client::init()
         return false;
     }
 
-    if (Settings::isInList(_destinationHostname, _settings.skipProxyList))
+    if (_settings.isInSkipProxyList(_destinationHostname) || _settings.isInSkipProxyRangeList(_destination.addr))
     {
         directConnect = true;
         proxyConnect = false;

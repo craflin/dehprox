@@ -3,7 +3,7 @@
 
 #include <nstd/Error.hpp>
 
-ProxyServer::ProxyServer(const Settings& settings) : _settings(settings) , _debugListener(*this)
+ProxyServer::ProxyServer(Settings& settings) : _settings(settings) , _debugListener(*this)
 {
     _server.setReuseAddress(true);
     _server.setKeepAlive(true);
@@ -12,16 +12,18 @@ ProxyServer::ProxyServer(const Settings& settings) : _settings(settings) , _debu
 
 bool ProxyServer::start()
 {
-    if (!_server.listen(_settings.listenAddr.addr, _settings.listenAddr.port, *this))
+    const Address& listenAddr = _settings.getListenAddr();
+    if (!_server.listen(listenAddr.addr, listenAddr.port, *this))
         return false;
     return true;
 }
 
 
-bool ProxyServer::startDebug()
+bool ProxyServer::startDebugPort()
 {
-    if (_settings.debugListenAddr.port)
-        if (!_server.listen(_settings.debugListenAddr.addr, _settings.debugListenAddr.port, _debugListener))
+    const Address& debugListenAddr = _settings.getDebugListenAddr();
+    if (debugListenAddr.port)
+        if (!_server.listen(debugListenAddr.addr, debugListenAddr.port, _debugListener))
             return false;
     return true;
 }
@@ -37,7 +39,7 @@ Server::Client::ICallback *ProxyServer::onAccepted(Server::Client &client_, uint
     address.addr = ip;
     address.port = port;
 
-    ::Client& client = _clients.append<Server&, Server::Client&, const Address&, Client::ICallback&, const Settings&>(_server, client_, address, *this, _settings);
+    ::Client& client = _clients.append<Server&, Server::Client&, const Address&, Client::ICallback&, Settings&>(_server, client_, address, *this, _settings);
     if (!client.init())
     {
         _clients.remove(client);

@@ -107,9 +107,10 @@ namespace {
 
 bool DnsServer::start()
 {
+    const Address& dnsListenAddr = _settings.getDnsListenAddr();
     if (!_socket.open(Socket::udpProtocol) ||
         !_socket.setReuseAddress() ||
-        !_socket.bind(_settings.dnsListenAddr.addr, _settings.dnsListenAddr.port))
+        !_socket.bind(dnsListenAddr.addr, dnsListenAddr.port))
         return false;
     return true;
 }
@@ -152,9 +153,9 @@ uint DnsServer::run()
                     goto ignoreRequest;
 
                 const char* rejectReason = nullptr;
-                if (!_settings.whiteList.isEmpty() && !Settings::isInList(hostname, _settings.whiteList))
+                if (!_settings.isWhiteListEmpty() && !_settings.isInWhiteList(hostname))
                     rejectReason = "Not listed in white list";
-                else if (Settings::isInList(hostname, _settings.blackList))
+                else if (_settings.isInBlackList(hostname))
                     rejectReason = "Listed in black list";
 
                 if (rejectReason)

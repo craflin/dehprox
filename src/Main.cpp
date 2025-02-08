@@ -54,8 +54,7 @@ int main(int argc, char* argv[])
     Log::setLevel(Log::debug);
 
     // load settings
-    Settings settings;
-    Settings::loadSettings(configFile, settings);
+    Settings settings(configFile);
 
     // daemonize process
 #ifndef _WIN32
@@ -74,28 +73,33 @@ int main(int argc, char* argv[])
 
     // start dns server
     DnsServer dnsServer(settings);
-    if (settings.dnsListenAddr.port)
+    const Address& dnsListenAddr = settings.getDnsListenAddr();
+    if (dnsListenAddr.port)
     {
         if (!dnsServer.start())
-            return Log::errorf("Could not start DNS server on UDP port %s:%hu: %s", (const char*)Socket::inetNtoA(settings.dnsListenAddr.addr), (uint16)settings.dnsListenAddr.port, (const char*)Socket::getErrorString()), 1;
-        Log::infof("Listening on UDP port %hu...", (uint16)settings.dnsListenAddr.port);
+            return Log::errorf("Could not start DNS server on UDP port %s:%hu: %s", (const char*)Socket::inetNtoA(dnsListenAddr.addr), (uint16)dnsListenAddr.port, (const char*)Socket::getErrorString()), 1;
+        Log::infof("Listening on UDP port %hu...", (uint16)dnsListenAddr.port);
     }
 
     // start transparent proxy server
     ProxyServer proxyServer(settings);
+    const Address& listenAddr = settings.getListenAddr();
     if (!proxyServer.start())
-        return Log::errorf("Could not start proxy server on TCP port %s:%hu: %s", (const char*)Socket::inetNtoA(settings.listenAddr.addr), (uint16)settings.listenAddr.port, (const char*)Socket::getErrorString()), 1;
-    Log::infof("Listening on TCP port %hu...", (uint16)settings.listenAddr.port);
-    if (settings.debugListenAddr.port)
+        return Log::errorf("Could not start proxy server on TCP port %s:%hu: %s", (const char*)Socket::inetNtoA(listenAddr.addr), (uint16)listenAddr.port, (const char*)Socket::getErrorString()), 1;
+    Log::infof("Listening on TCP port %hu...", (uint16)listenAddr.port);
+
+    // start listening for debug connections
+    const Address& debugListenAddr = settings.getDebugListenAddr();
+    if (debugListenAddr.port)
     {
-        if (!proxyServer.startDebug())
-            return Log::errorf("Could not start proxy server on debug TCP port %s:%hu: %s", (const char*)Socket::inetNtoA(settings.debugListenAddr.addr), (uint16)settings.debugListenAddr.port, (const char*)Socket::getErrorString()), 1;
-        Log::infof("Listening on debug TCP port %hu...", (uint16)settings.debugListenAddr.port);
+        if (!proxyServer.startDebugPort())
+            return Log::errorf("Could not start proxy server on debug TCP port %s:%hu: %s", (const char*)Socket::inetNtoA(debugListenAddr.addr), (uint16)debugListenAddr.port, (const char*)Socket::getErrorString()), 1;
+        Log::infof("Listening on debug TCP port %hu...", (uint16)debugListenAddr.port);
     }
 
     // run dns server
     Thread dnsThread;
-    if (settings.dnsListenAddr.port)
+    if (dnsListenAddr.port)
     {
         if (!dnsThread.start(dnsServer, &DnsServer::run))
             return Log::errorf("Could not start thread: %s", (const char*)Socket::getErrorString()), 1;
