@@ -74,6 +74,22 @@ Settings::Settings(const String& file) : _autoProxySkip(true)
             _blackList.append(value);
         else if (option == "skipProxyDest")
             _skipProxyList.append(value);
+        else if (option == "skipProxyRange")
+        {
+            List<String> tokens;
+            value.split(tokens, "/\\");
+            if (tokens.size() < 2)
+            {
+                Log::warningf("Cannot parse value: %s", (const char*)value);
+                continue;
+            }
+            IpRange range;
+            range.network = Socket::inetAddr(*tokens.begin());
+            uint32 subnet = (++tokens.begin())->toUInt();
+            range.mask = (uint32)-1 << (32 - subnet);
+            range.network &= range.mask;
+            _skipProxyRanges.append(range);
+        }
         else
             Log::warningf("Unknown option: %s", (const char*)option);
     }
@@ -113,6 +129,17 @@ bool Settings::isInBlackList(const String& destination) const
 bool Settings::isInSkipProxyList(const String& destination) const
 {
     return ::isInList(destination, _skipProxyList);
+}
+
+bool Settings::isInSkipProxyRangeList(uint32 ip) const
+{
+    for (Array<IpRange>::Iterator i = _skipProxyRanges.begin(), end = _skipProxyRanges.end(); i != end; ++i)
+    {
+        const IpRange& range = *i;
+        if ((ip & range.mask) == range.network)
+            return true;
+    }
+    return false;
 }
 
 namespace {

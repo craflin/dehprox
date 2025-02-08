@@ -92,7 +92,7 @@ bool Client::init()
         return false;
     }
 
-    if (_settings.isInSkipProxyList(_destinationHostname))
+    if (_settings.isInSkipProxyList(_destinationHostname) || _settings.isInSkipProxyRangeList(_destination.addr))
     {
         directConnect = true;
         proxyConnect = false;

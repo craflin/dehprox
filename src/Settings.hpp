@@ -22,9 +22,16 @@ public:
     bool isInWhiteList(const String& destination) const;
     bool isInBlackList(const String& destination) const;
     bool isInSkipProxyList(const String& destination) const;
+    bool isInSkipProxyRangeList(uint32 ip) const;
 
 private:
     typedef HashMap<String, Array<Address>> DestinationHttpProxyAddrsMap;
+
+    struct IpRange
+    {
+        uint32 network;
+        uint32 mask;
+    };
 
 private:
     Address _listenAddr;
@@ -36,6 +43,7 @@ private:
     HashSet<String> _whiteList;
     HashSet<String> _blackList;
     HashSet<String> _skipProxyList;
+    Array<IpRange> _skipProxyRanges;
 
 private:
     Settings(const Settings&);
