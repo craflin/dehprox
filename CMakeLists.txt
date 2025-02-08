@@ -2,7 +2,7 @@
 cmake_minimum_required(VERSION 3.5)
 cmake_policy(SET CMP0048 NEW)
 
-project(dehprox VERSION 0.1.3)
+project(dehprox VERSION 1.0.0)
 
 set(CDEPLOY_NO_DEBUG_BUILD True)
 set(CDEPLOY_NO_COMPILER True)
