@@ -28,7 +28,7 @@ namespace {
         while (!_nameToAddr.isEmpty())
         {
             const AddrInfo& addrInfo = *_nameToAddr.begin();
-            if (now - addrInfo.timestamp > 15 * 60 * 1000) // 15 minutes
+            if (now - addrInfo.timestamp > 60 * 60 * 1000) // 1 hour
             {
                 if (addrInfo.addr != 0)
                     _addrToName.remove(addrInfo.addr);
